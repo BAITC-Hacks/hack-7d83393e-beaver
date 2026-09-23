@@ -44,6 +44,16 @@
       <div id="speaker-map"></div>
       <button id="extract">Извлечь поручения</button>
       <div id="protocol"></div>
+      <section id="catchup-section" class="subcard" aria-labelledby="catchup-heading">
+        <h3 id="catchup-heading">Проверить выбранный интервал</h3>
+        <p class="muted">Выберите интервал в миллисекундах и подтвердите запрос. Результаты относятся только к этому интервалу.</p>
+        <form id="catchup-form" class="inline-form">
+          <label>Начало, мс<input id="catchup-start" type="number" min="0" step="1" required value="0"></label>
+          <label>Конец, мс<input id="catchup-end" type="number" min="1" step="1" required value="60000"></label>
+          <button id="catchup-button">Показать события</button>
+        </form>
+        <div id="catchup-result" class="empty-state">Интервал ещё не выбран.</div>
+      </section>
       <button id="approve" class="hidden">Утвердить протокол</button>
       <a id="export" class="button hidden" download="meeting-protocol.docx">Скачать DOCX (черновик)</a>
     </section>

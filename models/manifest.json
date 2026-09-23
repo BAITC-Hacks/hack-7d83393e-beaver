@@ -1,0 +1,77 @@
+{
+  "schema_version": "1",
+  "generated_at": "2026-09-23T12:06:14.992192+00:00",
+  "offline": true,
+  "hardware": {
+    "python": "3.12.3",
+    "system": "Linux-6.14.0-36-generic-x86_64-with-glibc2.39",
+    "cpu_count": 16,
+    "torch": "2.3.1+cpu",
+    "cuda_available": false,
+    "cuda_device": null,
+    "disk_free_bytes": 129968795648
+  },
+  "packages": {
+    "faster-whisper": "1.2.1",
+    "pyannote.audio": "3.3.2",
+    "ollama": "0.6.2",
+    "torch": "2.3.1+cpu",
+    "python-docx": "1.2.0"
+  },
+  "models": [
+    {
+      "name": "asr",
+      "source": "Hugging Face",
+      "model_id": "Systran/faster-whisper-small",
+      "revision": null,
+      "license": "MIT (model card)",
+      "local_path": "/home/user/Downloads/hack-7d83393e-beaver/models/faster-whisper-small",
+      "directory_sha256": "e7d2aaa76d26377369ab26a864d867d1c2ce8dae939ded791571f232d6a16869",
+      "required_files": [
+        "config.json",
+        "model.bin",
+        "tokenizer.json"
+      ],
+      "missing_files": [],
+      "preflight": "PASS",
+      "inference": "PASS"
+    },
+    {
+      "name": "diarization",
+      "source": "Hugging Face",
+      "model_id": "pyannote/speaker-diarization-community-1",
+      "revision": null,
+      "license": "CC-BY-4.0 (model card)",
+      "local_path": "/home/user/Downloads/hack-7d83393e-beaver/models/pyannote-community-1",
+      "directory_sha256": "4dcf64a8fc8a4fc0f2f356bab0920a424d5245e5efad5823a62485f2e04c8b54",
+      "required_files": [
+        "config.yaml"
+      ],
+      "missing_files": [
+        "config.yaml"
+      ],
+      "preflight": "FAIL",
+      "inference": "NOT RUN"
+    },
+    {
+      "name": "llm",
+      "source": "Ollama local runtime",
+      "model_id": "qwen2.5:3b",
+      "revision": null,
+      "license": "check the model card before redistribution",
+      "local_path": null,
+      "directory_sha256": null,
+      "preflight": "PASS",
+      "inference": "NOT RUN",
+      "ollama": {
+        "model": "qwen2.5:3b",
+        "executable": "/tmp/ollama-bin/bin/ollama",
+        "installed": true,
+        "returncode": 0,
+        "installed_models": [
+          "qwen2.5:3b"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": "1",
+  "files": [
+    {
+      "path": "data/synthetic/ru_sine.wav",
+      "kind": "synthetic",
+      "language": "ru",
+      "source": "ffmpeg lavfi sine generator",
+      "license": "generated locally",
+      "natural_audio": false,
+      "used_for": ["faster-whisper smoke inference"]
+    }
+  ],
+  "notice": "Synthetic tone is not a speech-quality or natural-audio evaluation."
+}

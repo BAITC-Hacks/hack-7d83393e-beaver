@@ -1,0 +1,14 @@
+{
+  "scope": "REFERENCE_HTTP_ONLY",
+  "status": "PASS",
+  "command": "python -m evidence_core serve --port 8765",
+  "request": "GET http://127.0.0.1:8765/api/health",
+  "http_status": 200,
+  "response": {
+    "status": "ok",
+    "scope": "REFERENCE_CORE_ONLY",
+    "models_loaded": false
+  },
+  "process_after_test": "stopped",
+  "model_inference": "NOT RUN"
+}

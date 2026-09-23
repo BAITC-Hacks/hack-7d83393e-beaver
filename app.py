@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from config import settings
-from contracts import empty_protocol, validate_protocol
+from contracts import empty_protocol, ledger_to_protocol, validate_protocol
 from storage import Storage
 
 
@@ -20,6 +20,25 @@ settings.ensure_dirs()
 storage = Storage(settings.db_path)
 app = FastAPI(title="Meeting assistant", version="0.1.0")
 app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
+
+
+@app.middleware("http")
+async def security_headers(request, call_next):
+    response = await call_next(request)
+    response.headers.setdefault(
+        "Content-Security-Policy",
+        "default-src 'self'; script-src 'self'; style-src 'self'; "
+        "media-src 'self' blob:; connect-src 'self'; object-src 'none'; "
+        "base-uri 'none'; frame-ancestors 'none'",
+    )
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("Referrer-Policy", "no-referrer")
+    return response
+
+
+def _public_error(prefix: str, exc: BaseException) -> str:
+    """Keep paths, URLs, and transcript snippets out of API/job errors."""
+    return f"{prefix}: {type(exc).__name__}"
 
 
 def _mode(value: str | None) -> str:
@@ -43,10 +62,15 @@ def _meeting_from_input(payload: dict[str, Any], meeting_id: str) -> dict[str, A
     if not isinstance(participants, list):
         raise HTTPException(422, "participants must be an array")
     normalized = []
+    participant_ids: set[str] = set()
     for item in participants:
         if not isinstance(item, dict) or not str(item.get("id") or "").strip() or not str(item.get("name") or "").strip():
             raise HTTPException(422, "each participant needs id and name")
-        normalized.append({"id": str(item["id"]), "name": str(item["name"])})
+        participant_id = str(item["id"]).strip()
+        if participant_id in participant_ids:
+            raise HTTPException(422, f"duplicate participant id: {participant_id}")
+        participant_ids.add(participant_id)
+        normalized.append({"id": participant_id, "name": str(item["name"]).strip()})
     return {
         "id": meeting_id,
         "started_at": started_at,
@@ -91,13 +115,17 @@ def _process_audio(job_id: str, meeting_id: str) -> None:
         protocol["utterances"] = speech.get("utterances", [])
         protocol["speaker_map"] = []
         protocol["warnings"] = list(speech.get("warnings", []))
+        # Validate the model boundary before persisting it.  A malformed ASR
+        # result must produce an explicit failed job, never a protocol that
+        # later becomes exportable or approvable.
+        validate_protocol(protocol)
         meeting["detected_speakers"] = speech.get("detected_speakers", [])
         storage.save_meeting(meeting_id, meeting)
         storage.save_protocol(meeting_id, protocol)
         storage.add_audit(meeting_id, "speech_completed", {"detected_speakers": speech.get("detected_speakers", [])})
         storage.update_job(job_id, status="done", stage="speech")
     except Exception as exc:
-        storage.update_job(job_id, status="error", stage="speech", error=f"{type(exc).__name__}: {exc}")
+        storage.update_job(job_id, status="error", stage="speech", error=_public_error("speech processing failed", exc))
 
 
 @app.get("/")
@@ -136,7 +164,10 @@ async def upload_audio(meeting_id: str, background_tasks: BackgroundTasks, file:
     if not file.filename:
         raise HTTPException(422, "audio file is required")
     suffix = Path(file.filename).suffix.lower() or ".audio"
-    target = settings.data_dir / "recordings" / f"{meeting_id}{suffix}"
+    recordings_dir = (settings.data_dir / "recordings").resolve()
+    target = (recordings_dir / f"{meeting['id']}{suffix}").resolve()
+    if target.parent != recordings_dir:
+        raise HTTPException(422, "invalid audio destination")
     with target.open("wb") as output:
         shutil.copyfileobj(file.file, output)
     meeting["audio_path"] = str(target)
@@ -162,6 +193,8 @@ def get_protocol(meeting_id: str) -> dict[str, Any]:
 
 @app.put("/api/meetings/{meeting_id}/speaker-map")
 def confirm_speaker_map(meeting_id: str, payload: dict[str, Any]) -> dict[str, Any]:
+    if not storage.get_meeting(meeting_id):
+        raise HTTPException(404, "meeting not found")
     protocol = _protocol_or_404(meeting_id)
     speaker_map = payload.get("speaker_map")
     if not isinstance(speaker_map, list):
@@ -194,7 +227,7 @@ def extract_protocol(meeting_id: str) -> dict[str, Any]:
             },
         )
     except Exception as exc:
-        raise HTTPException(502, f"protocol extraction failed: {type(exc).__name__}: {exc}") from exc
+        raise HTTPException(502, _public_error("protocol extraction failed", exc)) from exc
     protocol.update({k: result.get(k, protocol.get(k, [])) for k in ("tasks", "summary", "review_questions", "warnings")})
     validate_protocol(protocol)
     storage.save_protocol(meeting_id, protocol)
@@ -202,8 +235,88 @@ def extract_protocol(meeting_id: str) -> dict[str, Any]:
     return protocol
 
 
+@app.post("/api/meetings/{meeting_id}/ledger")
+def ingest_ledger(meeting_id: str, payload: dict[str, Any]) -> dict[str, Any]:
+    """Attach a typed event sidecar without changing contract 1.0 itself."""
+    meeting = storage.get_meeting(meeting_id)
+    if not meeting:
+        raise HTTPException(404, "meeting not found")
+    protocol = _protocol_or_404(meeting_id)
+    # Accept either the raw sidecar bundle or {"ledger": bundle}; the latter
+    # lets callers add transport metadata without making it part of the
+    # versioned ledger schema.
+    ledger = payload.get("ledger") if set(payload) == {"ledger"} else payload
+    if not isinstance(ledger, dict):
+        raise HTTPException(422, "ledger must be an object")
+    try:
+        # The meeting row contains operational fields (mode, audio path,
+        # approval state).  Keep those out of the preserved 1.0 snapshot
+        # before the sidecar adapter validates its exact meeting shape.
+        snapshot_protocol = copy.deepcopy(protocol)
+        snapshot_protocol["meeting"] = {
+            key: meeting[key] for key in ("id", "started_at", "timezone", "title")
+        }
+        adapted = ledger_to_protocol(ledger, snapshot_protocol)
+    except ValueError as exc:
+        raise HTTPException(422, f"ledger validation failed: {exc}") from exc
+    storage.save_ledger(meeting_id, ledger)
+    storage.save_protocol(meeting_id, adapted)
+    storage.add_audit(
+        meeting_id,
+        "ledger_attached",
+        {"event_count": len(ledger.get("events", [])), "task_count": len(adapted["tasks"])},
+    )
+    return adapted
+
+
+@app.get("/api/meetings/{meeting_id}/ledger")
+def get_ledger(meeting_id: str) -> dict[str, Any]:
+    if not storage.get_meeting(meeting_id):
+        raise HTTPException(404, "meeting not found")
+    ledger = storage.get_ledger(meeting_id)
+    if ledger is None:
+        raise HTTPException(404, "ledger is not attached")
+    return ledger
+
+
+@app.post("/api/meetings/{meeting_id}/ledger/replay")
+def replay_ledger(meeting_id: str, payload: dict[str, Any]) -> dict[str, Any]:
+    """Replay a typed evidence ledger and adapt it to snapshot contract 1.0."""
+    meeting = storage.get_meeting(meeting_id)
+    current = _protocol_or_404(meeting_id)
+    if not meeting:
+        raise HTTPException(404, "meeting not found")
+    ledger = payload.get("ledger", payload)
+    cutoff = payload.get("cutoff_ms") if isinstance(payload, dict) else None
+    try:
+        from services.ledger import replay, to_protocol, validate_bundle
+        normalized = validate_bundle(ledger)
+        sidecar = replay(normalized, cutoff)
+        adapted = to_protocol(
+            normalized,
+            meeting={k: meeting[k] for k in ("id", "started_at", "timezone", "title")},
+            participants=meeting["participants"],
+            speaker_map=current.get("speaker_map", []),
+            utterances=current.get("utterances", []),
+            cutoff_ms=cutoff,
+        )
+        validate_protocol(adapted)
+    except Exception as exc:
+        raise HTTPException(422, f"ledger replay failed: {type(exc).__name__}: {exc}") from exc
+    storage.save_ledger(meeting_id, normalized)
+    # A historical replay is a read of the ledger.  Persisting it as the
+    # current protocol would silently roll the meeting back to an earlier
+    # state, so only a full replay may replace the stored snapshot.
+    if cutoff is None:
+        storage.save_protocol(meeting_id, adapted)
+    storage.add_audit(meeting_id, "ledger_replayed", {"cutoff_ms": cutoff, "event_count": len(normalized["events"])})
+    return {"snapshot": adapted, "ledger": sidecar}
+
+
 @app.patch("/api/meetings/{meeting_id}/tasks/{task_id}")
 def edit_task(meeting_id: str, task_id: str, payload: dict[str, Any]) -> dict[str, Any]:
+    if not storage.get_meeting(meeting_id):
+        raise HTTPException(404, "meeting not found")
     protocol = _protocol_or_404(meeting_id)
     task = next((item for item in protocol["tasks"] if item["id"] == task_id), None)
     if not task:
@@ -215,15 +328,19 @@ def edit_task(meeting_id: str, task_id: str, payload: dict[str, Any]) -> dict[st
     previous = {key: task.get(key) for key in changes}
     task.update(changes)
     task["review_status"] = "needs_review"
-    storage.add_audit(meeting_id, "human_task_edit", {"task_id": task_id, "previous": previous, "changes": changes})
     validate_protocol(protocol)
     storage.save_protocol(meeting_id, protocol)
+    # The human correction is a storage audit event, never synthetic audio
+    # evidence.  Record it only after the edited snapshot passed validation.
+    storage.add_audit(meeting_id, "human_task_edit", {"task_id": task_id, "previous": previous, "changes": changes})
     return task
 
 
 @app.post("/api/meetings/{meeting_id}/approve")
 def approve(meeting_id: str) -> dict[str, Any]:
     meeting = storage.get_meeting(meeting_id)
+    if not meeting:
+        raise HTTPException(404, "meeting not found")
     protocol = _protocol_or_404(meeting_id)
     for task in protocol["tasks"]:
         task["review_status"] = "approved"
@@ -247,8 +364,10 @@ def export_docx(meeting_id: str):
         export_protocol["approval_status"] = (meeting or {}).get("approval_status", "draft")
         content = render(export_protocol)
     except Exception as exc:
-        raise HTTPException(500, f"DOCX export failed: {type(exc).__name__}: {exc}") from exc
-    output = settings.data_dir / f"{meeting_id}.docx"
+        raise HTTPException(500, _public_error("DOCX export failed", exc)) from exc
+    output = (settings.data_dir / f"{meeting['id']}.docx").resolve()
+    if output.parent != settings.data_dir.resolve():
+        raise HTTPException(500, "invalid export destination")
     output.write_bytes(content)
     return FileResponse(output, media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document", filename="meeting-protocol.docx")
 

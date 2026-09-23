@@ -1,0 +1,14 @@
+{
+  "run_id": "evaluate",
+  "scope": "EVALUATE",
+  "checks": [
+    {
+      "requirement_id": "real_inference",
+      "test_id": "evaluate_input",
+      "status": "NOT RUN",
+      "reason": "evaluation adapter requires a new local audio case and does not use fixtures"
+    }
+  ],
+  "artifacts": [],
+  "notice": "NOT RUN and FAIL are preserved; this report does not turn fixtures into REAL inference."
+}

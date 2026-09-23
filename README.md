@@ -2,10 +2,13 @@
 
 Дата подготовки: 23 сентября 2026 года.
 
-**Статус: локальный прототип собран.** Есть FastAPI/SQLite, локальный интерфейс,
-контрактный протокол, fixture-путь до DOCX и явные ошибки REAL-режима при
-отсутствии моделей. Реальный ASR/диаризация/LLM считаются готовыми только после
-проверки локальных весов и Ollama на целевой машине.
+**Статус: локальный прототип и проверочный контур собраны.** Есть FastAPI/SQLite,
+локальный интерфейс, контрактный протокол, fixture-путь до DOCX, manifest моделей
+и явные ошибки REAL-режима. В текущем отчёте ASR-вес найден, комплект pyannote
+неполный, а Ollama отсутствует; поэтому реальный сквозной сценарий не объявляется
+готовым. См. [`TEST_REPORT.md`](TEST_REPORT.md). Локальная `qwen2.5:3b`
+скачана и доступна Ollama; строгий text extraction отмечен в отчёте как
+`NOT RUN` после тайм-аута.
 
 ## Начало работы
 Передать интегратору `MASTER_PROMPT.md`, затем дать каждому исполнителю
@@ -42,55 +45,103 @@
 - `DEMO.md`: сценарий защиты и реплики для самостоятельной записи.
 - `SOURCES.md`: первичная документация компонентов.
 - `check_examples.py`: проверка схемы и ссылочной целостности эталонов.
+- `scripts/cli.py`: команды `bootstrap`, `doctor`, `run`, `test`, `e2e`, `stop`.
+- `scripts/model_manifest.py`: офлайн-инвентаризация моделей и digest каталога.
+- `models/manifest.json`: фактическое состояние весов в текущей среде.
+- `TEST_REPORT.md`, `reports/test-results.json`: фактические результаты проверок.
+- `requirements-traceability.json`: матрица требований, команд и фактических статусов.
 
 Для проверки эталонов нужен Python с пакетом `jsonschema`.
 
 ## Локальная проверка и экспорт
 
-Создание окружения и запуск сервера:
+Создание окружения и установка Python-зависимостей выполняются в режиме
+`BOOTSTRAP_ONLINE`:
 
 ```bash
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
-.venv/bin/uvicorn app:app --host 127.0.0.1 --port 8000
+.venv/bin/python scripts/cli.py bootstrap
+```
+
+`bootstrap` устанавливает только Python-пакеты. Он не скачивает модели.
+Запуск приложения выполняется отдельно в режиме `RUN_OFFLINE`:
+
+```bash
+.venv/bin/python scripts/cli.py doctor
+.venv/bin/python scripts/cli.py run --host 127.0.0.1 --port 8000
+# в другом терминале
+.venv/bin/python scripts/cli.py stop
 ```
 
 Откройте `http://127.0.0.1:8000`. Для проверки UI без моделей выберите режим
 `FIXTURE`; постоянный баннер помечает синтетический результат.
 
-Команды ниже не отправляют аудио или протоколы наружу. Версия Python в среде,
-где выполнялась проверка D: `3.12.3`; ОС и характеристики оборудования не
-фиксируются автоматически, поэтому их нужно добавить в отчёт конкретного
-запуска. Экспорт требует `python-docx` (MIT), проверка схемы — `jsonschema`
-(MIT). Локальные модели имеют собственные лицензии; перед распространением
-нужно проверить LICENSE каждого веса.
+Единая CLI-точка для повторяемых проверок:
+
+```bash
+.venv/bin/python scripts/cli.py doctor
+.venv/bin/python scripts/cli.py test
+.venv/bin/python scripts/cli.py e2e
+.venv/bin/python scripts/cli.py verify --profile core --offline --out reports/core
+.venv/bin/python scripts/cli.py verify --profile full --offline --out reports/full
+.venv/bin/python scripts/cli.py stop
+```
+
+`verify --profile full` возвращает код 2, пока обязательные REAL-модули не
+проверены. `evaluate --input <dir> --out <dir>` создаёт отчёт с `NOT RUN`, если
+новый набор реальных данных не передан. Модельный manifest находится в
+`models/manifest.json`, а отчёт запуска — в `reports/`.
+
+Команды проверки не отправляют аудио или протоколы наружу. В текущей среде:
+Python `3.12.3`, Linux x86_64, 16 CPU, 30 GiB RAM, 126 GiB свободного места;
+обнаружена NVIDIA GeForce RTX 3070 Laptop GPU (8 GiB), но установленный
+`torch 2.3.1+cpu` не использует CUDA; Ollama работает в CPU-профиле. Точный список пакетов и digest записаны в
+`models/manifest.json`. Экспорт требует `python-docx` (MIT), проверка схемы —
+`jsonschema` (MIT). Лицензии локальных моделей указаны в manifest и требуют
+отдельной проверки перед распространением.
 
 Подготовка весов выполняется заранее, пока сеть разрешена, с явным указанием
 локальных каталогов. Например, для faster-whisper:
 
 ```bash
-python3 -m pip install python-docx jsonschema huggingface_hub
-python3 - <<'PY'
+.venv/bin/pip install huggingface_hub
+.venv/bin/python - <<'PY'
 from huggingface_hub import snapshot_download
 snapshot_download("Systran/faster-whisper-small", local_dir="models/faster-whisper-small")
 PY
-ollama pull qwen2.5:7b
+ollama pull qwen2.5:3b
 ```
 
-После подготовки запуск не скачивает модели: задайте `ASR_MODEL_PATH`,
-`DIARIZATION_MODEL_PATH` и `OLLAMA_MODEL`, затем проверьте окружение офлайн:
+Для pyannote `community-1` требуется вручную принять условия модели и получить
+разрешённый локальный snapshot; токены не записываются в репозиторий. Пример
+подготовки выполняется только в online shell. После подготовки запуск не
+скачивает модели: задайте `ASR_MODEL_PATH`/`WHISPER_MODEL_PATH`,
+`DIARIZATION_MODEL_PATH`/`PYANNOTE_MODEL_PATH`, `OLLAMA_BIN` и `OLLAMA_MODEL`, затем проверьте
+окружение офлайн:
 
 ```bash
-python3 scripts/preflight.py --json --strict
-python3 check_examples.py
-python3 -m unittest discover -s tests -v
+.venv/bin/python scripts/model_manifest.py
+.venv/bin/python scripts/preflight.py --json --strict
+.venv/bin/python scripts/cli.py test
 ```
 
-`preflight.py` проверяет пути весов, локальный `ollama list`, чтение WAV или
-локального файла через `ffprobe`, а также импорты FastAPI, ASR, диаризации,
-экспорта и служебных пакетов. Он не скачивает зависимости и не принимает URL.
+`preflight.py` проверяет обязательные файлы весов, локальный `ollama list`,
+чтение WAV или локального файла через `ffprobe`, а также импорты FastAPI, ASR,
+диаризации, экспорта и служебных пакетов. Он не скачивает зависимости или
+модели и не принимает URL. Наличие обязательных файлов ещё не является
+доказательством inference: это отдельно фиксируется в manifest и отчёте.
 Сквозной fixture-путь сервера проверяется `tests/test_app.py`; он не заменяет
 обязательную проверку новой реальной записи.
+
+Для типизированной истории есть sidecar [`ledger.schema.json`](ledger.schema.json)
+и `services/ledger.py`. Endpoint `POST /api/meetings/{id}/ledger/replay`
+воспроизводит create/propose/accept/reject/cancel по префиксу времени и явно
+адаптирует результат обратно к snapshot-контракту 1.0.
+
+`scripts/cli.py e2e` запускает только локальный fixture smoke test и явно печатает
+`REAL audio/browser E2E = NOT RUN`. Браузерная проверка, три новые записи и
+offline acceptance требуют отдельного запуска и не получают PASS автоматически.
 
 Три обязательных сценария для ручного отчёта:
 

@@ -7,8 +7,14 @@ data/
 !.env.example
 weights/
 models/
+!models/
+models/*
+!models/manifest.json
+models/ollama/
 recordings/
 real_data/
 *.wav
 *.mp3
 *.mp4
+.run/
+reports/*.log

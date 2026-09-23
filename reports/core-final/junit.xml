@@ -1,0 +1,4 @@
+<testsuite name="meeting-assistant" tests="2" failures="0" skipped="1">
+  <testcase classname="meeting-assistant" name="unit_contract"/>
+  <testcase classname="meeting-assistant" name="offline_preflight"><skipped message="['diarization_weights']"/></testcase>
+</testsuite>

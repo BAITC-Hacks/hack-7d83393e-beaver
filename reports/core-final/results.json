@@ -1,0 +1,31 @@
+{
+  "run_id": "core-final",
+  "scope": "CORE",
+  "generated_at": "2026-09-23T12:06:53.523439+00:00",
+  "duration_seconds": 1.119,
+  "checks": [
+    {
+      "requirement_id": "core",
+      "test_id": "unit_contract",
+      "status": "PASS",
+      "command": "/home/user/Downloads/hack-7d83393e-beaver/.venv/bin/python -m unittest discover -s tests -v",
+      "exit_code": 0
+    },
+    {
+      "requirement_id": "local_models",
+      "test_id": "offline_preflight",
+      "status": "NOT RUN",
+      "command": "/home/user/Downloads/hack-7d83393e-beaver/.venv/bin/python scripts/preflight.py --json",
+      "exit_code": 0,
+      "reason": [
+        "diarization_weights"
+      ]
+    }
+  ],
+  "artifacts": [],
+  "manifests": {
+    "models": "/home/user/Downloads/hack-7d83393e-beaver/models/manifest.json",
+    "data": "/home/user/Downloads/hack-7d83393e-beaver/reports/data-manifest.json"
+  },
+  "notice": "NOT RUN and FAIL are preserved; this report does not turn fixtures into REAL inference."
+}

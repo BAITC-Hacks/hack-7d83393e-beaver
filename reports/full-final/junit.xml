@@ -1,0 +1,8 @@
+<testsuite name="meeting-assistant" tests="6" failures="0" skipped="5">
+  <testcase classname="meeting-assistant" name="unit_contract"/>
+  <testcase classname="meeting-assistant" name="offline_preflight"><skipped message="['diarization_weights']"/></testcase>
+  <testcase classname="meeting-assistant" name="real_ru_e2e"><skipped message="requires a new local RU recording"/></testcase>
+  <testcase classname="meeting-assistant" name="real_kk_e2e"><skipped message="requires a new local KK recording"/></testcase>
+  <testcase classname="meeting-assistant" name="real_mix_e2e"><skipped message="requires a new local mixed recording"/></testcase>
+  <testcase classname="meeting-assistant" name="offline_browser_e2e"><skipped message="not executed by this command"/></testcase>
+</testsuite>

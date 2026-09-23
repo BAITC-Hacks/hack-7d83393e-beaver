@@ -1,0 +1,425 @@
+{
+  "scope": "REFERENCE_CORE_ONLY",
+  "generated_at": "2026-09-23T11:30:51.335621+00:00",
+  "python": "3.13.5",
+  "exit_code": 0,
+  "tests": [
+    {
+      "test": "tests/test_core.py::test_existing_contract_examples[01_mixed_deadline.json]",
+      "status": "PASS",
+      "duration_s": 0.001629
+    },
+    {
+      "test": "tests/test_core.py::test_existing_contract_examples[02_ru_missing_fields.json]",
+      "status": "PASS",
+      "duration_s": 0.000816
+    },
+    {
+      "test": "tests/test_core.py::test_existing_contract_examples[03_kk_no_new_task.json]",
+      "status": "PASS",
+      "duration_s": 0.001634
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_rejects_structure_errors[<lambda>-DUPLICATE_ID]",
+      "status": "PASS",
+      "duration_s": 0.000793
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_rejects_structure_errors[<lambda>-UNKNOWN_ASSIGNEE]",
+      "status": "PASS",
+      "duration_s": 0.000753
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_rejects_structure_errors[<lambda>-BROKEN_EVIDENCE0]",
+      "status": "PASS",
+      "duration_s": 0.000761
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_rejects_structure_errors[<lambda>-MISSING_FIELD_EVIDENCE0]",
+      "status": "PASS",
+      "duration_s": 0.000899
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_rejects_structure_errors[<lambda>-MISSING_FIELD_EVIDENCE1]",
+      "status": "PASS",
+      "duration_s": 0.000759
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_rejects_structure_errors[<lambda>-TIME_WITHOUT_DATE]",
+      "status": "PASS",
+      "duration_s": 0.000707
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_rejects_structure_errors[<lambda>-TIME_RANGE]",
+      "status": "PASS",
+      "duration_s": 0.000888
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_rejects_structure_errors[<lambda>-EMPTY_CONFIRMED_MAPPING]",
+      "status": "PASS",
+      "duration_s": 0.000773
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_rejects_structure_errors[<lambda>-UNKNOWN_PARTICIPANT]",
+      "status": "PASS",
+      "duration_s": 0.00083
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_rejects_structure_errors[<lambda>-UNMAPPED_VOICE]",
+      "status": "PASS",
+      "duration_s": 0.00075
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_rejects_structure_errors[<lambda>-SCHEMA0]",
+      "status": "PASS",
+      "duration_s": 0.000815
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_rejects_structure_errors[<lambda>-TIMEZONE]",
+      "status": "PASS",
+      "duration_s": 0.001375
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_rejects_structure_errors[<lambda>-SCHEMA1]",
+      "status": "PASS",
+      "duration_s": 0.000743
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_rejects_structure_errors[<lambda>-BROKEN_EVIDENCE1]",
+      "status": "PASS",
+      "duration_s": 0.000753
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_rejects_structure_errors[<lambda>-UNKNOWN_TASK]",
+      "status": "PASS",
+      "duration_s": 0.000731
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_rejects_structure_errors[<lambda>-DUPLICATE_EVENT]",
+      "status": "PASS",
+      "duration_s": 0.000818
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_rejects_structure_errors[<lambda>-SCHEMA2]",
+      "status": "PASS",
+      "duration_s": 0.000758
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_handles_invalid_roots[None]",
+      "status": "PASS",
+      "duration_s": 0.000127
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_handles_invalid_roots[raw1]",
+      "status": "PASS",
+      "duration_s": 0.000109
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_handles_invalid_roots[raw2]",
+      "status": "PASS",
+      "duration_s": 0.000168
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_handles_invalid_roots[string]",
+      "status": "PASS",
+      "duration_s": 0.000103
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_handles_invalid_roots[42]",
+      "status": "PASS",
+      "duration_s": 0.000378
+    },
+    {
+      "test": "tests/test_core.py::test_auditor_handles_invalid_roots[True]",
+      "status": "PASS",
+      "duration_s": 0.000113
+    },
+    {
+      "test": "tests/test_core.py::test_structure_never_claims_semantic_proof",
+      "status": "PASS",
+      "duration_s": 0.001008
+    },
+    {
+      "test": "tests/test_core.py::test_hash_changes_with_input",
+      "status": "PASS",
+      "duration_s": 0.001658
+    },
+    {
+      "test": "tests/test_core.py::test_audit_does_not_modify_input",
+      "status": "PASS",
+      "duration_s": 0.000825
+    },
+    {
+      "test": "tests/test_core.py::test_time_travel_is_prefix_correct[0-None-0]",
+      "status": "PASS",
+      "duration_s": 0.000879
+    },
+    {
+      "test": "tests/test_core.py::test_time_travel_is_prefix_correct[5999-None-0]",
+      "status": "PASS",
+      "duration_s": 0.000313
+    },
+    {
+      "test": "tests/test_core.py::test_time_travel_is_prefix_correct[6000-2026-09-25-1]",
+      "status": "PASS",
+      "duration_s": 0.000337
+    },
+    {
+      "test": "tests/test_core.py::test_time_travel_is_prefix_correct[16000-2026-09-25-1]",
+      "status": "PASS",
+      "duration_s": 0.000298
+    },
+    {
+      "test": "tests/test_core.py::test_time_travel_is_prefix_correct[21999-2026-09-25-1]",
+      "status": "PASS",
+      "duration_s": 0.000274
+    },
+    {
+      "test": "tests/test_core.py::test_time_travel_is_prefix_correct[22000-2026-09-28-1]",
+      "status": "PASS",
+      "duration_s": 0.000344
+    },
+    {
+      "test": "tests/test_core.py::test_time_travel_is_prefix_correct[35000-2026-09-28-1]",
+      "status": "PASS",
+      "duration_s": 0.000424
+    },
+    {
+      "test": "tests/test_core.py::test_time_travel_is_prefix_correct[40000-2026-09-28-1]",
+      "status": "PASS",
+      "duration_s": 0.000292
+    },
+    {
+      "test": "tests/test_core.py::test_time_travel_is_prefix_correct[48000-2026-09-28-2]",
+      "status": "PASS",
+      "duration_s": 0.000291
+    },
+    {
+      "test": "tests/test_core.py::test_agreement_not_proposal_changes_value",
+      "status": "PASS",
+      "duration_s": 0.000433
+    },
+    {
+      "test": "tests/test_core.py::test_rejected_change_preserves_accepted_value",
+      "status": "PASS",
+      "duration_s": 0.000289
+    },
+    {
+      "test": "tests/test_core.py::test_acceptance_combines_proposal_and_confirmation_evidence",
+      "status": "PASS",
+      "duration_s": 0.000562
+    },
+    {
+      "test": "tests/test_core.py::test_unknowns_are_questions_not_invented_values",
+      "status": "PASS",
+      "duration_s": 0.000302
+    },
+    {
+      "test": "tests/test_core.py::test_replay_deterministic_and_nonmutating",
+      "status": "PASS",
+      "duration_s": 0.000483
+    },
+    {
+      "test": "tests/test_core.py::test_ledger_rejects_invalid_events[<lambda>0]",
+      "status": "PASS",
+      "duration_s": 0.000207
+    },
+    {
+      "test": "tests/test_core.py::test_ledger_rejects_invalid_events[<lambda>1]",
+      "status": "PASS",
+      "duration_s": 0.000148
+    },
+    {
+      "test": "tests/test_core.py::test_ledger_rejects_invalid_events[<lambda>2]",
+      "status": "PASS",
+      "duration_s": 0.00015
+    },
+    {
+      "test": "tests/test_core.py::test_ledger_rejects_invalid_events[<lambda>3]",
+      "status": "PASS",
+      "duration_s": 0.00015
+    },
+    {
+      "test": "tests/test_core.py::test_ledger_rejects_invalid_events[<lambda>4]",
+      "status": "PASS",
+      "duration_s": 0.000155
+    },
+    {
+      "test": "tests/test_core.py::test_ledger_rejects_invalid_events[<lambda>5]",
+      "status": "PASS",
+      "duration_s": 0.000401
+    },
+    {
+      "test": "tests/test_core.py::test_ledger_rejects_invalid_events[<lambda>6]",
+      "status": "PASS",
+      "duration_s": 0.000198
+    },
+    {
+      "test": "tests/test_core.py::test_ledger_rejects_invalid_events[<lambda>7]",
+      "status": "PASS",
+      "duration_s": 0.000155
+    },
+    {
+      "test": "tests/test_core.py::test_ledger_rejects_invalid_events[<lambda>8]",
+      "status": "PASS",
+      "duration_s": 0.00018
+    },
+    {
+      "test": "tests/test_core.py::test_ledger_rejects_invalid_events[<lambda>9]",
+      "status": "PASS",
+      "duration_s": 0.000203
+    },
+    {
+      "test": "tests/test_core.py::test_ledger_rejects_invalid_events[<lambda>10]",
+      "status": "PASS",
+      "duration_s": 0.000178
+    },
+    {
+      "test": "tests/test_core.py::test_ledger_rejects_invalid_events[<lambda>11]",
+      "status": "PASS",
+      "duration_s": 0.000141
+    },
+    {
+      "test": "tests/test_core.py::test_ledger_rejects_invalid_events[<lambda>12]",
+      "status": "PASS",
+      "duration_s": 0.000152
+    },
+    {
+      "test": "tests/test_core.py::test_ledger_rejects_invalid_events[<lambda>13]",
+      "status": "PASS",
+      "duration_s": 0.000178
+    },
+    {
+      "test": "tests/test_core.py::test_ledger_rejects_invalid_events[<lambda>14]",
+      "status": "PASS",
+      "duration_s": 0.000208
+    },
+    {
+      "test": "tests/test_core.py::test_ledger_rejects_invalid_events[<lambda>15]",
+      "status": "PASS",
+      "duration_s": 0.000131
+    },
+    {
+      "test": "tests/test_core.py::test_bad_cutoff_rejected[-1]",
+      "status": "PASS",
+      "duration_s": 0.000148
+    },
+    {
+      "test": "tests/test_core.py::test_bad_cutoff_rejected[True]",
+      "status": "PASS",
+      "duration_s": 0.000148
+    },
+    {
+      "test": "tests/test_core.py::test_bad_cutoff_rejected[1.2]",
+      "status": "PASS",
+      "duration_s": 0.000191
+    },
+    {
+      "test": "tests/test_core.py::test_bad_cutoff_rejected[12]",
+      "status": "PASS",
+      "duration_s": 0.000364
+    },
+    {
+      "test": "tests/test_core.py::test_future_invalid_event_is_not_hidden_by_cutoff",
+      "status": "PASS",
+      "duration_s": 0.000154
+    },
+    {
+      "test": "tests/test_core.py::test_stale_proposal_cannot_overwrite_newer_agreement",
+      "status": "PASS",
+      "duration_s": 0.000315
+    },
+    {
+      "test": "tests/test_core.py::test_cancel_stops_active_task",
+      "status": "PASS",
+      "duration_s": 0.000324
+    },
+    {
+      "test": "tests/test_core.py::test_do_not_reopen_cancelled_task_implicitly",
+      "status": "PASS",
+      "duration_s": 0.000219
+    },
+    {
+      "test": "tests/test_core.py::test_participant_rename_changes_ids_without_changing_logic",
+      "status": "PASS",
+      "duration_s": 0.000292
+    },
+    {
+      "test": "tests/test_core.py::test_export_roundtrip_matches_saved_deadline",
+      "status": "PASS",
+      "duration_s": 0.042995
+    },
+    {
+      "test": "tests/test_core.py::test_export_rejects_invalid_evidence",
+      "status": "PASS",
+      "duration_s": 0.000944
+    },
+    {
+      "test": "tests/test_core.py::test_http_health_does_not_claim_model_readiness",
+      "status": "PASS",
+      "duration_s": 0.003006
+    },
+    {
+      "test": "tests/test_core.py::test_http_capabilities_disclose_missing_components",
+      "status": "PASS",
+      "duration_s": 0.001746
+    },
+    {
+      "test": "tests/test_core.py::test_http_audit_and_docx",
+      "status": "PASS",
+      "duration_s": 0.039151
+    },
+    {
+      "test": "tests/test_core.py::test_http_replay",
+      "status": "PASS",
+      "duration_s": 0.002522
+    },
+    {
+      "test": "tests/test_core.py::test_http_malformed_ledger",
+      "status": "PASS",
+      "duration_s": 0.006335
+    },
+    {
+      "test": "tests/test_core.py::test_unknown_fixture_no_path_access",
+      "status": "PASS",
+      "duration_s": 0.001623
+    },
+    {
+      "test": "tests/test_core.py::test_cross_origin_write_denied",
+      "status": "PASS",
+      "duration_s": 0.000874
+    },
+    {
+      "test": "tests/test_core.py::test_payload_limit",
+      "status": "PASS",
+      "duration_s": 0.002751
+    },
+    {
+      "test": "tests/test_core.py::test_ui_static_local_security",
+      "status": "PASS",
+      "duration_s": 0.006674
+    },
+    {
+      "test": "tests/test_core.py::test_no_external_swagger_assets",
+      "status": "PASS",
+      "duration_s": 0.006505
+    }
+  ],
+  "counts": {
+    "PASS": 80,
+    "FAIL": 0,
+    "NOT RUN": 0
+  },
+  "not_tested": [
+    "audio_input",
+    "asr_ru",
+    "asr_kk",
+    "asr_mixed",
+    "diarization",
+    "llm_extraction",
+    "camera",
+    "natural_audio_e2e",
+    "full_pipeline_offline"
+  ],
+  "claim": "Tests verify software mechanics on synthetic annotations, NOT AI accuracy or hackathon completion."
+}

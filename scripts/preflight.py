@@ -31,13 +31,33 @@ def _check_dependency(module: str, label: str | None = None) -> dict[str, Any]:
     return {"name": label or module, "module": module, "available": present}
 
 
-def _check_path(path: Path, label: str) -> dict[str, Any]:
-    return {
+def _check_path(path: Path, label: str, required_files: tuple[str, ...] = ()) -> dict[str, Any]:
+    """Inspect a local model directory without resolving anything online.
+
+    ``Path.exists()`` alone is too weak for a model preflight: a Hugging Face
+    model directory containing only ``README.md`` would otherwise be reported
+    as ready.  The required file list is deliberately small and format based;
+    inference still remains the authoritative model check.
+    """
+    result: dict[str, Any] = {
         "name": label,
         "path": str(path),
-        "available": path.exists(),
+        "available": False,
         "is_directory": path.is_dir() if path.exists() else False,
     }
+    if not path.exists():
+        result["message"] = "каталог не найден"
+        return result
+    if not path.is_dir():
+        result["message"] = "путь не является каталогом"
+        return result
+    missing = [name for name in required_files if not (path / name).is_file()]
+    result["required_files"] = list(required_files)
+    result["missing_files"] = missing
+    result["available"] = not missing and any(path.iterdir())
+    if missing:
+        result["message"] = "неполный комплект весов: " + ", ".join(missing)
+    return result
 
 
 def _audio_check(path: Path | None) -> dict[str, Any]:
@@ -77,7 +97,8 @@ def _audio_check(path: Path | None) -> dict[str, Any]:
 
 
 def _ollama_check(model: str) -> dict[str, Any]:
-    executable = shutil.which("ollama")
+    configured = os.environ.get("OLLAMA_BIN")
+    executable = configured if configured and Path(configured).is_file() else shutil.which("ollama")
     result: dict[str, Any] = {
         "name": "local_llm",
         "model": model,
@@ -122,14 +143,18 @@ def run_preflight(
     """Return a JSON-compatible local readiness report."""
 
     asr_model = asr_model or Path(
-        os.environ.get("ASR_MODEL_PATH", project_root / "models" / "faster-whisper-small")
+        os.environ.get("ASR_MODEL_PATH")
+        or os.environ.get("WHISPER_MODEL_PATH")
+        or project_root / "models" / "faster-whisper-small"
     )
     diarization_model = diarization_model or Path(
-        os.environ.get("DIARIZATION_MODEL_PATH", project_root / "models" / "pyannote-community-1")
+        os.environ.get("DIARIZATION_MODEL_PATH")
+        or os.environ.get("PYANNOTE_MODEL_PATH")
+        or project_root / "models" / "pyannote-community-1"
     )
     checks = [
-        _check_path(asr_model, "asr_weights"),
-        _check_path(diarization_model, "diarization_weights"),
+        _check_path(asr_model, "asr_weights", ("config.json", "model.bin", "tokenizer.json")),
+        _check_path(diarization_model, "diarization_weights", ("config.yaml",)),
         _ollama_check(llm_model),
         _audio_check(audio),
     ]

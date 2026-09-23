@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.0",
+  "mode": "FIXTURE",
+  "meeting": {
+    "id": "kk-past-action",
+    "started_at": "2026-09-23T10:00:00+05:00",
+    "timezone": "Asia/Almaty",
+    "title": "Вымышленное тестовое совещание"
+  },
+  "participants": [
+    {
+      "id": "p1",
+      "name": "Руководитель"
+    },
+    {
+      "id": "p2",
+      "name": "Данияр"
+    },
+    {
+      "id": "p3",
+      "name": "Айдана"
+    }
+  ],
+  "speaker_map": [
+    {
+      "speaker_id": "SPEAKER_00",
+      "participant_id": "p1",
+      "confirmed": true
+    },
+    {
+      "speaker_id": "SPEAKER_01",
+      "participant_id": "p2",
+      "confirmed": true
+    },
+    {
+      "speaker_id": "SPEAKER_02",
+      "participant_id": "p3",
+      "confirmed": true
+    }
+  ],
+  "utterances": [
+    {
+      "id": "u1",
+      "start_ms": 0,
+      "end_ms": 4000,
+      "speaker_id": "SPEAKER_01",
+      "text": "Кеше есепті жібердім."
+    }
+  ],
+  "tasks": [],
+  "summary": [
+    {
+      "text": "Данияр сообщил, что вчера отправил отчёт. Новое поручение не сформулировано.",
+      "evidence_ids": [
+        "u1"
+      ]
+    }
+  ],
+  "review_questions": [],
+  "warnings": [
+    "Синтетический эталон. Не результат работы ASR/LLM."
+  ],
+  "presence_intervals": []
+}

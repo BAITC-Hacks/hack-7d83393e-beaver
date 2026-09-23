@@ -41,6 +41,11 @@ class Storage:
                     data_json TEXT NOT NULL,
                     updated_at TEXT NOT NULL
                 );
+                CREATE TABLE IF NOT EXISTS ledgers (
+                    meeting_id TEXT PRIMARY KEY,
+                    data_json TEXT NOT NULL,
+                    updated_at TEXT NOT NULL
+                );
                 CREATE TABLE IF NOT EXISTS audit_events (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     meeting_id TEXT NOT NULL,
@@ -77,6 +82,19 @@ class Storage:
     def get_protocol(self, meeting_id: str) -> dict[str, Any] | None:
         with self.connect() as db:
             row = db.execute("SELECT data_json FROM protocols WHERE meeting_id = ?", (meeting_id,)).fetchone()
+        return json.loads(row["data_json"]) if row else None
+
+    def save_ledger(self, meeting_id: str, ledger: dict[str, Any]) -> None:
+        """Persist the typed event sidecar separately from protocol 1.0."""
+        with self.connect() as db:
+            db.execute(
+                "INSERT OR REPLACE INTO ledgers(meeting_id, data_json, updated_at) VALUES (?, ?, ?)",
+                (meeting_id, json.dumps(ledger, ensure_ascii=False), self.now()),
+            )
+
+    def get_ledger(self, meeting_id: str) -> dict[str, Any] | None:
+        with self.connect() as db:
+            row = db.execute("SELECT data_json FROM ledgers WHERE meeting_id = ?", (meeting_id,)).fetchone()
         return json.loads(row["data_json"]) if row else None
 
     def add_audit(self, meeting_id: str, event_type: str, data: dict[str, Any]) -> None:

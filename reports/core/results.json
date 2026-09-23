@@ -1,0 +1,26 @@
+{
+  "run_id": "core",
+  "scope": "CORE",
+  "checks": [
+    {
+      "requirement_id": "core",
+      "test_id": "unit_contract",
+      "status": "PASS",
+      "command": "/home/user/Downloads/hack-7d83393e-beaver/.venv/bin/python -m unittest discover -s tests -v",
+      "exit_code": 0
+    },
+    {
+      "requirement_id": "local_models",
+      "test_id": "offline_preflight",
+      "status": "NOT RUN",
+      "command": "/home/user/Downloads/hack-7d83393e-beaver/.venv/bin/python scripts/preflight.py --json",
+      "exit_code": 0,
+      "reason": [
+        "diarization_weights",
+        "local_llm"
+      ]
+    }
+  ],
+  "artifacts": [],
+  "notice": "NOT RUN and FAIL are preserved; this report does not turn fixtures into REAL inference."
+}

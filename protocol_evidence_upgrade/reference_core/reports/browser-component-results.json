@@ -1,0 +1,21 @@
+{
+  "scope": "REFERENCE_BROWSER_COMPONENT_ONLY",
+  "status": "PASS",
+  "transport": "TestClient / in-process ASGI via test fetch adapter",
+  "browser": "144.0.7559.96",
+  "checks": [
+    "component_render",
+    "time_slider",
+    "accepted_and_rejected_change",
+    "evidence_click",
+    "audit_button",
+    "docx_download",
+    "switch_fixture",
+    "escaped_untrusted_text",
+    "no_javascript_errors"
+  ],
+  "live_browser_http": "NOT RUN",
+  "live_browser_http_reason": "Managed Chromium policy returned ERR_BLOCKED_BY_ADMINISTRATOR for loopback; no policy changed.",
+  "network_isolation": "NOT RUN",
+  "model_inference": "NOT RUN"
+}

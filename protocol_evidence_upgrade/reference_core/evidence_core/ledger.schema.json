@@ -1,0 +1,233 @@
+{
+  "$defs": {
+    "Event": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "minLength": 1,
+          "title": "Event Id",
+          "type": "string"
+        },
+        "task_id": {
+          "minLength": 1,
+          "title": "Task Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "create",
+            "propose",
+            "accept",
+            "reject",
+            "cancel"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "at_ms": {
+          "minimum": 0,
+          "title": "At Ms",
+          "type": "integer"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "initial": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/State"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "patch": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Patch"
+        },
+        "proposal_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Proposal Id"
+        }
+      },
+      "required": [
+        "event_id",
+        "task_id",
+        "kind",
+        "at_ms",
+        "evidence_ids"
+      ],
+      "title": "Event",
+      "type": "object"
+    },
+    "State": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "minLength": 1,
+          "title": "Action",
+          "type": "string"
+        },
+        "assignee_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Assignee Id"
+        },
+        "due_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Due Date"
+        },
+        "due_time": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Due Time"
+        }
+      },
+      "required": [
+        "action"
+      ],
+      "title": "State",
+      "type": "object"
+    },
+    "Utterance": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "start_ms": {
+          "minimum": 0,
+          "title": "Start Ms",
+          "type": "integer"
+        },
+        "end_ms": {
+          "exclusiveMinimum": 0,
+          "title": "End Ms",
+          "type": "integer"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "start_ms",
+        "end_ms",
+        "text"
+      ],
+      "title": "Utterance",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "ledger_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Ledger Version",
+      "type": "string"
+    },
+    "mode": {
+      "enum": [
+        "REAL",
+        "FIXTURE"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "meeting_id": {
+      "minLength": 1,
+      "title": "Meeting Id",
+      "type": "string"
+    },
+    "participants": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Participants",
+      "type": "array"
+    },
+    "utterances": {
+      "items": {
+        "$ref": "#/$defs/Utterance"
+      },
+      "title": "Utterances",
+      "type": "array"
+    },
+    "events": {
+      "items": {
+        "$ref": "#/$defs/Event"
+      },
+      "title": "Events",
+      "type": "array"
+    }
+  },
+  "required": [
+    "mode",
+    "meeting_id",
+    "participants",
+    "utterances",
+    "events"
+  ],
+  "title": "Bundle",
+  "type": "object"
+}

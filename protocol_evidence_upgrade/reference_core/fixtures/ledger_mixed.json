@@ -1,0 +1,132 @@
+{
+  "ledger_version": "1.0",
+  "mode": "FIXTURE",
+  "meeting_id": "ledger-demo",
+  "participants": [
+    "p1",
+    "p2",
+    "p3"
+  ],
+  "utterances": [
+    {
+      "id": "u1",
+      "start_ms": 0,
+      "end_ms": 6000,
+      "text": "Данияр, отчётты жұмаға дейін жіберіңіз."
+    },
+    {
+      "id": "u2",
+      "start_ms": 7000,
+      "end_ms": 16000,
+      "text": "К пятнице не успею. Предлагаю в понедельник, 28 сентября, до 12:00."
+    },
+    {
+      "id": "u3",
+      "start_ms": 17000,
+      "end_ms": 22000,
+      "text": "Да, согласовано: 28 сентября до 12:00."
+    },
+    {
+      "id": "u4",
+      "start_ms": 24000,
+      "end_ms": 29000,
+      "text": "Может быть, перенесём ещё на среду, 30 сентября?"
+    },
+    {
+      "id": "u5",
+      "start_ms": 30000,
+      "end_ms": 35000,
+      "text": "Предлагаю 30 сентября до 12:00."
+    },
+    {
+      "id": "u6",
+      "start_ms": 36000,
+      "end_ms": 40000,
+      "text": "Нет. Оставляем согласованный срок: понедельник, 28 сентября, до 12:00."
+    },
+    {
+      "id": "u7",
+      "start_ms": 42000,
+      "end_ms": 48000,
+      "text": "Ещё нужно проверить интеграцию. Исполнителя и срок пока не определили."
+    }
+  ],
+  "events": [
+    {
+      "event_id": "e1",
+      "task_id": "t1",
+      "kind": "create",
+      "at_ms": 6000,
+      "evidence_ids": [
+        "u1"
+      ],
+      "initial": {
+        "action": "Отправить отчёт",
+        "assignee_id": "p2",
+        "due_date": "2026-09-25",
+        "due_time": null
+      }
+    },
+    {
+      "event_id": "e2",
+      "task_id": "t1",
+      "kind": "propose",
+      "at_ms": 16000,
+      "evidence_ids": [
+        "u2"
+      ],
+      "patch": {
+        "due_date": "2026-09-28",
+        "due_time": "12:00:00"
+      }
+    },
+    {
+      "event_id": "e3",
+      "task_id": "t1",
+      "kind": "accept",
+      "at_ms": 22000,
+      "evidence_ids": [
+        "u3"
+      ],
+      "proposal_id": "e2"
+    },
+    {
+      "event_id": "e4",
+      "task_id": "t1",
+      "kind": "propose",
+      "at_ms": 35000,
+      "evidence_ids": [
+        "u4",
+        "u5"
+      ],
+      "patch": {
+        "due_date": "2026-09-30"
+      }
+    },
+    {
+      "event_id": "e5",
+      "task_id": "t1",
+      "kind": "reject",
+      "at_ms": 40000,
+      "evidence_ids": [
+        "u6"
+      ],
+      "proposal_id": "e4"
+    },
+    {
+      "event_id": "e6",
+      "task_id": "t2",
+      "kind": "create",
+      "at_ms": 48000,
+      "evidence_ids": [
+        "u7"
+      ],
+      "initial": {
+        "action": "Проверить интеграцию",
+        "assignee_id": null,
+        "due_date": null,
+        "due_time": null
+      }
+    }
+  ]
+}

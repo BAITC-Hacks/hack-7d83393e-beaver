@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0",
+  "scope": "REFERENCE_CORE_AND_UPGRADE_SPEC",
+  "requirements": [
+    {
+      "id": "REQ-01",
+      "title": "Распознавание речи",
+      "status": "NOT RUN",
+      "reason": "Нужны локальные модели и audio E2E"
+    },
+    {
+      "id": "REQ-02",
+      "title": "Русский язык",
+      "status": "NOT RUN",
+      "reason": "Нет inference на RU-аудио"
+    },
+    {
+      "id": "REQ-03",
+      "title": "Казахский язык",
+      "status": "NOT RUN",
+      "reason": "Нет inference на KK-аудио"
+    },
+    {
+      "id": "REQ-04",
+      "title": "Смешанная речь",
+      "status": "NOT RUN",
+      "reason": "Нет inference на mixed-аудио"
+    },
+    {
+      "id": "REQ-05",
+      "title": "Автоматическое извлечение поручений",
+      "status": "NOT RUN",
+      "reason": "Reference обрабатывает заранее размеченные структуры"
+    },
+    {
+      "id": "REQ-06",
+      "title": "Диаризация и связь с участниками",
+      "status": "NOT RUN",
+      "reason": "Не реализовано в reference core"
+    },
+    {
+      "id": "REQ-07",
+      "title": "Экспорт итогового протокола",
+      "status": "NOT RUN",
+      "reason": "JSON→DOCX проверен, полный audio→DOCX не проверен"
+    },
+    {
+      "id": "CORE-01",
+      "title": "Структурная проверка ссылок",
+      "status": "PASS",
+      "reason": "См. tests/test_core.py и reference-results.json"
+    },
+    {
+      "id": "CORE-02",
+      "title": "Типизированный replay",
+      "status": "PASS",
+      "reason": "Размеченные синтетические события, не извлечение"
+    },
+    {
+      "id": "CORE-03",
+      "title": "Вопросы по неизвестным полям",
+      "status": "PASS",
+      "reason": "По структурированным событиям"
+    },
+    {
+      "id": "CORE-04",
+      "title": "DOCX из снимка",
+      "status": "PASS",
+      "reason": "Генерация, roundtrip и визуальная проверка"
+    }
+  ],
+  "core_test_counts": {
+    "PASS": 80,
+    "FAIL": 0,
+    "NOT RUN": 0
+  },
+  "not_a_hackathon_score": true
+}

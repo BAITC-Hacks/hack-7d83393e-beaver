@@ -1,0 +1,126 @@
+{
+  "schema_version": "1.0",
+  "mode": "FIXTURE",
+  "meeting": {
+    "id": "mixed-deadline",
+    "started_at": "2026-09-23T10:00:00+05:00",
+    "timezone": "Asia/Almaty",
+    "title": "Вымышленное тестовое совещание"
+  },
+  "participants": [
+    {
+      "id": "p1",
+      "name": "Руководитель"
+    },
+    {
+      "id": "p2",
+      "name": "Данияр"
+    },
+    {
+      "id": "p3",
+      "name": "Айдана"
+    }
+  ],
+  "speaker_map": [
+    {
+      "speaker_id": "SPEAKER_00",
+      "participant_id": "p1",
+      "confirmed": true
+    },
+    {
+      "speaker_id": "SPEAKER_01",
+      "participant_id": "p2",
+      "confirmed": true
+    },
+    {
+      "speaker_id": "SPEAKER_02",
+      "participant_id": "p3",
+      "confirmed": true
+    }
+  ],
+  "utterances": [
+    {
+      "id": "u1",
+      "start_ms": 0,
+      "end_ms": 6000,
+      "speaker_id": "SPEAKER_00",
+      "text": "Данияр, отчётты жұмаға дейін жіберіңіз."
+    },
+    {
+      "id": "u2",
+      "start_ms": 7000,
+      "end_ms": 16000,
+      "speaker_id": "SPEAKER_01",
+      "text": "К пятнице не успею. Предлагаю в понедельник, 28 сентября, до 12:00."
+    },
+    {
+      "id": "u3",
+      "start_ms": 17000,
+      "end_ms": 22000,
+      "speaker_id": "SPEAKER_00",
+      "text": "Да, согласовано: 28 сентября до 12:00."
+    }
+  ],
+  "tasks": [
+    {
+      "id": "t1",
+      "action": "Отправить отчёт",
+      "assignee_id": "p2",
+      "due_date": "2026-09-28",
+      "due_time": "12:00:00",
+      "deadline_raw": "28 сентября до 12:00",
+      "dialogue_status": "agreed",
+      "review_status": "draft",
+      "evidence": {
+        "action": [
+          "u1"
+        ],
+        "assignee": [
+          "u1"
+        ],
+        "deadline": [
+          "u2",
+          "u3"
+        ]
+      },
+      "history": [
+        {
+          "event_id": "e1",
+          "kind": "created",
+          "previous_value": null,
+          "new_value": "Срок: 2026-09-25, время не задано",
+          "accepted_in_dialogue": true,
+          "evidence_ids": [
+            "u1"
+          ]
+        },
+        {
+          "event_id": "e2",
+          "kind": "deadline_changed",
+          "previous_value": "2026-09-25",
+          "new_value": "2026-09-28 12:00:00",
+          "accepted_in_dialogue": true,
+          "evidence_ids": [
+            "u2",
+            "u3"
+          ]
+        }
+      ]
+    }
+  ],
+  "summary": [
+    {
+      "text": "Данияр должен отправить отчёт 28 сентября до 12:00; перенос срока согласован.",
+      "evidence_ids": [
+        "u1",
+        "u2",
+        "u3"
+      ]
+    }
+  ],
+  "review_questions": [],
+  "warnings": [
+    "Синтетический эталон. Не результат работы ASR/LLM."
+  ],
+  "presence_intervals": []
+}

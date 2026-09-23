@@ -1,0 +1,31 @@
+{
+  "schema_version": "1",
+  "generated_at": "2026-09-23T11:41:00+00:00",
+  "commands": [
+    {
+      "command": ".venv/bin/python scripts/cli.py test",
+      "status": "PASS",
+      "tests_run": 18,
+      "scope": "fixture, contract, protocol and DOCX data-level tests"
+    },
+    {
+      "command": ".venv/bin/python scripts/preflight.py --json",
+      "status": "NOT READY",
+      "scope": "offline dependency and local model inventory",
+      "unavailable": ["diarization_weights"]
+    },
+    {
+      "command": ".venv/bin/python scripts/model_manifest.py",
+      "status": "PASS",
+      "scope": "manifest generation; synthetic Whisper smoke inference PASS; Ollama installed; text extraction NOT RUN"
+    }
+  ],
+  "acceptance": {
+    "fixture_protocol_and_docx": "PASS",
+    "real_asr": "PASS (synthetic smoke only)",
+    "real_diarization": "FAIL",
+    "local_llm": "NOT RUN (model installed; strict extraction timed out)",
+    "real_ru_kk_mix_e2e": "NOT RUN",
+    "offline_browser_e2e": "NOT RUN"
+  }
+}
