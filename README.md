@@ -126,6 +126,15 @@ ollama pull qwen2.5:3b
 .venv/bin/python scripts/cli.py test
 ```
 
+Для GPU-профиля faster-whisper нужны CUDA-библиотеки CTranslate2 и явные
+параметры запуска:
+
+```bash
+.venv/bin/pip install nvidia-cublas-cu12 nvidia-cuda-nvrtc-cu12
+export LD_LIBRARY_PATH="$PWD/.venv/lib/python3.12/site-packages/nvidia/cublas/lib:$PWD/.venv/lib/python3.12/site-packages/nvidia/cuda_nvrtc/lib:$LD_LIBRARY_PATH"
+export WHISPER_DEVICE=cuda WHISPER_COMPUTE_TYPE=float16
+```
+
 `preflight.py` проверяет обязательные файлы весов, локальный `ollama list`,
 чтение WAV или локального файла через `ffprobe`, а также импорты FastAPI, ASR,
 диаризации, экспорта и служебных пакетов. Он не скачивает зависимости или
