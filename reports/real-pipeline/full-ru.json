@@ -1,0 +1,96 @@
+{
+  "meeting": {
+    "id": "real-ru-gpu",
+    "started_at": "2026-09-23T10:00:00+06:00",
+    "timezone": "Asia/Almaty",
+    "title": "REAL RU GPU"
+  },
+  "speech": {
+    "utterances": [
+      {
+        "id": "u1",
+        "start_ms": 0,
+        "end_ms": 2800,
+        "speaker_id": "SPEAKER_01",
+        "text": "Панир! Отправьте от чертбук от ныксу!"
+      },
+      {
+        "id": "u2",
+        "start_ms": 2960,
+        "end_ms": 5220,
+        "speaker_id": "SPEAKER_01",
+        "text": "Пригабаю пиенести срок на панигельник!"
+      },
+      {
+        "id": "u3",
+        "start_ms": 5660,
+        "end_ms": 6760,
+        "speaker_id": "SPEAKER_01",
+        "text": "Та! Собасована!"
+      }
+    ],
+    "detected_speakers": [
+      "SPEAKER_01"
+    ],
+    "warnings": [],
+    "language": "ru"
+  },
+  "protocol": {
+    "schema_version": "1.0",
+    "mode": "REAL",
+    "meeting": {
+      "id": "real-ru-gpu",
+      "started_at": "2026-09-23T10:00:00+06:00",
+      "timezone": "Asia/Almaty",
+      "title": "REAL RU GPU"
+    },
+    "participants": [
+      {
+        "id": "p1",
+        "name": "Данияр"
+      }
+    ],
+    "speaker_map": [
+      {
+        "speaker_id": "SPEAKER_01",
+        "participant_id": "p1",
+        "confirmed": true
+      }
+    ],
+    "utterances": [
+      {
+        "id": "u1",
+        "start_ms": 0,
+        "end_ms": 2800,
+        "speaker_id": "SPEAKER_01",
+        "text": "Панир! Отправьте от чертбук от ныксу!"
+      },
+      {
+        "id": "u2",
+        "start_ms": 2960,
+        "end_ms": 5220,
+        "speaker_id": "SPEAKER_01",
+        "text": "Пригабаю пиенести срок на панигельник!"
+      },
+      {
+        "id": "u3",
+        "start_ms": 5660,
+        "end_ms": 6760,
+        "speaker_id": "SPEAKER_01",
+        "text": "Та! Собасована!"
+      }
+    ],
+    "tasks": [],
+    "summary": [
+      {
+        "text": "status",
+        "evidence_ids": [
+          "u1"
+        ]
+      }
+    ],
+    "review_questions": [],
+    "warnings": [],
+    "presence_intervals": []
+  }
+}

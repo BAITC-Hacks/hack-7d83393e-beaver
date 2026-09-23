@@ -120,6 +120,11 @@ ollama pull qwen2.5:3b
 `DIARIZATION_MODEL_PATH`/`PYANNOTE_MODEL_PATH`, `OLLAMA_BIN` и `OLLAMA_MODEL`, затем проверьте
 окружение офлайн:
 
+В проверенном локальном профиле использован открытый ONNX-экспорт сегментации
+`FredrikKarlssonSpeech/pyannote-speaker-diarization-onnx` (CC-BY-4.0):
+`DIARIZATION_MODEL_PATH=./models/pyannote-onnx`. Метки слотов говорящих всё
+равно требуют подтверждения секретаря.
+
 ```bash
 .venv/bin/python scripts/model_manifest.py
 .venv/bin/python scripts/preflight.py --json --strict

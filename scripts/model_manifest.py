@@ -166,6 +166,26 @@ def _asr_inference(path: Path, project_root: Path) -> str:
         return f"FAIL: {type(exc).__name__}: {exc}"
 
 
+def _diarization_inference(path: Path, project_root: Path) -> str:
+    audio = project_root / "data" / "synthetic" / "ru_sine.wav"
+    model = path / "segmentation" / "model_int8.onnx"
+    if not model.is_file() or not audio.is_file():
+        return "NOT RUN"
+    try:
+        import numpy as np
+        import onnxruntime as ort
+        import soundfile as sf
+        samples, rate = sf.read(audio, dtype="float32")
+        if rate != 16000:
+            return "NOT RUN"
+        if samples.ndim > 1:
+            samples = samples.mean(axis=1)
+        output = ort.InferenceSession(str(model)).run(None, {"waveform": samples[np.newaxis, np.newaxis, :]})[0]
+        return "PASS" if output.ndim == 3 and output.shape[-1] == 7 else "FAIL"
+    except Exception as exc:
+        return f"FAIL: {type(exc).__name__}: {exc}"
+
+
 def build_manifest(project_root: Path = ROOT) -> dict[str, Any]:
     asr_path = _path_from_env(
         "ASR_MODEL_PATH", "WHISPER_MODEL_PATH", default=project_root / "models" / "faster-whisper-small"
@@ -195,11 +215,12 @@ def build_manifest(project_root: Path = ROOT) -> dict[str, Any]:
             _model_entry(
                 name="diarization",
                 source="Hugging Face",
-                model_id="pyannote/speaker-diarization-community-1",
+                model_id="FredrikKarlssonSpeech/pyannote-speaker-diarization-onnx" if (diar_path / "segmentation" / "model_int8.onnx").is_file() else "pyannote/speaker-diarization-community-1",
                 revision=None,
-                license_name="CC-BY-4.0 (model card)",
+                license_name="CC-BY-4.0",
                 path=diar_path,
-                required_files=("config.yaml",),
+                required_files=("segmentation/model_int8.onnx",) if (diar_path / "segmentation" / "model_int8.onnx").is_file() else ("config.yaml",),
+                inference=_diarization_inference(diar_path, project_root),
             ),
             {
                 "name": "llm",

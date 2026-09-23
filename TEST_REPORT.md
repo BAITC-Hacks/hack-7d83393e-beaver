@@ -24,6 +24,7 @@
 | `.venv/bin/python scripts/cli.py e2e` | NOT RUN | команда ограничена fixture smoke test; REAL audio/browser E2E не выполнен |
 | локальный faster-whisper на `data/real/*_case.wav` | PASS, 3/3 | espeak-сгенерированная речь; это synthetic-speech smoke, не natural-audio оценка |
 | faster-whisper на RTX 3070 (`cuda`, `float16`) | PASS, 3/3 | `reports/real-asr/gpu-results.json`; GPU после рестарта работает |
+| REAL ASR + ONNX diarization + local LLM + DOCX (RU) | PASS | `reports/real-pipeline/full-ru.json`, `full-ru.docx`; slot speaker mapping подтверждена вручную |
 
 ## Требования приёмки
 
@@ -32,8 +33,9 @@
 | Контрактные fixtures, evidence и null | PASS | `scripts/cli.py test` |
 | DOCX из протокола и казахские буквы | PASS | `tests/acceptance/test_export_docx.py` |
 | Реальный ASR inference | PASS (synthetic speech, 3/3) | `reports/real-asr/results.json`, локальный `faster-whisper-small`, CPU |
-| Реальная диаризация | FAIL | в `models/pyannote-community-1` отсутствует `config.yaml` |
-| Локальная LLM | NOT RUN | веса `qwen2.5:3b` остались локально, но временный Ollama runtime недоступен после очистки `/tmp`; предыдущий запуск schema extraction превысил 180-секундный тайм-аут |
+| Реальная диаризация | PASS (ONNX) | `models/pyannote-onnx`, 3 speech-кейса; исходный gated PyTorch snapshot недоступен |
+| Локальная LLM | PASS (text extraction) | `qwen2.5:3b` через локальный Ollama 0.1.48, контрактный snapshot валиден |
+| Полный HTTP REAL путь | PASS | create → GPU ASR → ONNX diarization → speaker-map → local LLM → approve → DOCX; `reports/real-pipeline/http-real-ru.json` |
 | Русская, казахская и смешанная новая запись | NOT RUN | нет подтверждённого REAL E2E |
 | Заблокированная сеть и браузерная проверка | NOT RUN | не выполнялись в этой среде |
 | DOCX после реальной записи | NOT RUN | зависит от ASR, диаризации и LLM |

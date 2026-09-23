@@ -17,4 +17,5 @@ real_data/
 *.mp3
 *.mp4
 .run/
+.local/
 reports/*.log

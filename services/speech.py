@@ -239,6 +239,63 @@ def _huggingface_offline() -> Iterable[None]:
 
 
 def _load_diarization_model(path: Path, options: _SpeechOptions) -> Any:
+    # A small, open ONNX export of the community-1 segmentation component is
+    # accepted as a local alternative when the original gated PyTorch
+    # pipeline is unavailable.  It produces powerset speaker activity; the
+    # stable slot labels are intentionally still subject to secretary mapping.
+    onnx_path = path / "segmentation" / "model_int8.onnx"
+    if onnx_path.is_file():
+        try:
+            import onnxruntime as ort
+            import numpy as np
+            import soundfile as sf
+        except ImportError as exc:
+            raise ModelUnavailableError("ONNX diarization requires onnxruntime, numpy and soundfile") from exc
+
+        class _OnnxDiarizer:
+            def __init__(self) -> None:
+                providers = ["CPUExecutionProvider"]
+                if options.device != "cpu" and "CUDAExecutionProvider" in ort.get_available_providers():
+                    providers.insert(0, "CUDAExecutionProvider")
+                self.session = ort.InferenceSession(str(onnx_path), providers=providers)
+                self.np = np
+                self.sf = sf
+
+            def __call__(self, audio_path: str) -> list[tuple[int, int, str]]:
+                audio, rate = self.sf.read(audio_path, dtype="float32")
+                if audio.ndim > 1:
+                    audio = audio.mean(axis=1)
+                if rate != 16000:
+                    from scipy.signal import resample_poly
+                    import math
+                    divisor = math.gcd(int(rate), 16000)
+                    audio = resample_poly(audio, 16000 // divisor, int(rate) // divisor).astype("float32")
+                waveform = audio[self.np.newaxis, self.np.newaxis, :]
+                scores = self.session.run(None, {"waveform": waveform})[0][0]
+                labels = self.np.argmax(scores, axis=-1)
+                frame_ms = 1000.0 * len(audio) / max(1, len(labels))
+                active: list[tuple[int, int, str]] = []
+                current: tuple[int, int, str] | None = None
+                powerset = {1: "SPEAKER_00", 2: "SPEAKER_01", 4: "SPEAKER_02", 3: "SPEAKER_00", 5: "SPEAKER_00", 6: "SPEAKER_01"}
+                for index, raw_label in enumerate(labels):
+                    label = powerset.get(int(raw_label))
+                    start, end = round(index * frame_ms), round((index + 1) * frame_ms)
+                    if label is None:
+                        if current is not None:
+                            active.append(current)
+                            current = None
+                        continue
+                    if current is not None and current[2] == label and current[1] >= start - 40:
+                        current = (current[0], end, label)
+                    else:
+                        if current is not None:
+                            active.append(current)
+                        current = (start, end, label)
+                if current is not None:
+                    active.append(current)
+                return [item for item in active if item[1] - item[0] >= 120]
+
+        return _OnnxDiarizer()
     try:
         from pyannote.audio import Pipeline
     except ImportError as exc:
@@ -294,6 +351,9 @@ def _run_diarization(model: Any, audio_path: Path) -> Any:
 
 
 def _read_diarization(result: Any) -> tuple[list[tuple[int, int, str]], list[str]]:
+    if isinstance(result, list) and all(isinstance(item, tuple) and len(item) == 3 for item in result):
+        intervals = [(int(start), int(end), str(label)) for start, end, label in result if int(end) > int(start)]
+        return intervals, sorted({label for _start, _end, label in intervals})
     annotation = getattr(result, "speaker_diarization", result)
     if not hasattr(annotation, "itertracks"):
         raise SpeechError("pyannote не вернул Annotation с itertracks()")

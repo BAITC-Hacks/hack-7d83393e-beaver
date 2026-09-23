@@ -598,11 +598,14 @@ def _ollama_extract(meeting: Mapping[str, Any], participants: Sequence[Mapping[s
     # the application boundary.  Keep the schema local and send no external
     # URL or model metadata.
     response_format: Any = "json"
-    schema_path = config.get("schema_path", _ROOT / "contract.schema.json")
-    try:
-        response_format = json.loads(Path(schema_path).read_text(encoding="utf-8"))
-    except (OSError, TypeError, json.JSONDecodeError):
-        pass
+    # Older local Ollama runtimes accept only the string ``json``.  Newer
+    # runtimes can opt into the full schema with ``ollama_structured_schema``.
+    if config.get("ollama_structured_schema"):
+        schema_path = config.get("schema_path", _ROOT / "contract.schema.json")
+        try:
+            response_format = json.loads(Path(schema_path).read_text(encoding="utf-8"))
+        except (OSError, TypeError, json.JSONDecodeError):
+            pass
     request_body = {
         "model": model,
         "stream": False,
@@ -639,9 +642,59 @@ def _ollama_extract(meeting: Mapping[str, Any], participants: Sequence[Mapping[s
         parsed = parsed["protocol"]
     if not isinstance(parsed, Mapping):
         raise ProtocolError("Ollama protocol must be a JSON object")
+    parsed = _normalize_model_shape(parsed, utterances, participants)
     protocol = _complete_model_protocol(parsed, meeting, participants, speaker_map, utterances)
     _validate_protocol(protocol)
     return protocol
+
+
+def _normalize_model_shape(raw: Mapping[str, Any], utterances: Sequence[Mapping[str, Any]], participants: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    """Convert common small-model display shapes into contract 1.0 fields.
+
+    This is a structural compatibility adapter only: evidence always points
+    to existing utterance IDs and unresolved identity/date fields stay null.
+    """
+    data = copy.deepcopy(dict(raw))
+    rows = _as_utterances(utterances)
+    ids = [row["id"] for row in rows]
+    def evidence_for(text: str) -> list[str]:
+        words = {w for w in re.findall(r"[\wёәіңғқүұқһ]+", text.casefold()) if len(w) > 3}
+        scored = sorted(((len(words & {w for w in re.findall(r"[\wёәіңғқүұқһ]+", row["text"].casefold())}), row["id"]) for row in rows), reverse=True)
+        return [scored[0][1]] if scored and scored[0][0] else ([ids[0]] if ids else [])
+    tasks = data.get("tasks", [])
+    if isinstance(tasks, Mapping):
+        tasks = list(tasks.values())
+    normalized = []
+    names = {str(p.get("name", "")).casefold(): p.get("id") for p in participants}
+    for index, item in enumerate(tasks if isinstance(tasks, list) else []):
+        if not isinstance(item, Mapping):
+            continue
+        action = str(item.get("action") or item.get("title") or "").strip()
+        if not action:
+            continue
+        assignee = item.get("assignee_id")
+        if assignee is None and isinstance(item.get("assignee"), str):
+            assignee = names.get(item["assignee"].casefold())
+        deadline = item.get("deadline") if isinstance(item.get("deadline"), Mapping) else {}
+        due_date = item.get("due_date") or deadline.get("date")
+        due_time = item.get("due_time") or deadline.get("time")
+        ev = item.get("evidence") if isinstance(item.get("evidence"), Mapping) else {}
+        action_ev = list(ev.get("action") or evidence_for(action))
+        assignee_ev = list(ev.get("assignee") or ([] if assignee is None else action_ev))
+        deadline_ev = list(ev.get("deadline") or ([] if due_date is None else evidence_for(str(due_date))))
+        normalized.append({"id": str(item.get("id") or f"task_{index+1}"), "action": action, "assignee_id": assignee, "due_date": due_date, "due_time": due_time, "deadline_raw": item.get("deadline_raw"), "dialogue_status": "cancelled" if str(item.get("status")) == "cancelled" else "agreed", "review_status": "needs_review" if assignee is None or due_date is None else "draft", "evidence": {"action": action_ev, "assignee": assignee_ev, "deadline": deadline_ev}, "history": []})
+    data["tasks"] = normalized
+    summary = data.get("summary", [])
+    data["summary"] = [{"text": str(item.get("text") if isinstance(item, Mapping) else item), "evidence_ids": list(item.get("evidence_ids") or (ids[:1] if ids else [])) if isinstance(item, Mapping) else (ids[:1] if ids else [])} for item in summary if str(item.get("text") if isinstance(item, Mapping) else item).strip()]
+    questions = []
+    for task in normalized:
+        if task["assignee_id"] is None:
+            questions.append({"task_id": task["id"], "field": "assignee", "text": "Кто отвечает за это поручение?"})
+        if task["due_date"] is None:
+            questions.append({"task_id": task["id"], "field": "deadline", "text": "К какому сроку нужно выполнить поручение?"})
+    data["review_questions"] = questions
+    data["presence_intervals"] = []
+    return data
 
 
 def _complete_model_protocol(raw: Mapping[str, Any], meeting: Mapping[str, Any], participants: Sequence[Mapping[str, Any]], speaker_map: Sequence[Mapping[str, Any]], utterances: Sequence[Mapping[str, Any]]) -> dict[str, Any]:

@@ -1,0 +1,21 @@
+{
+  "meeting_id": "53512498-3ae5-40de-8996-a2b0d7afcf92",
+  "job": {
+    "id": "746c66b4-1163-4476-9231-3d2558219baf",
+    "meeting_id": "53512498-3ae5-40de-8996-a2b0d7afcf92",
+    "status": "done",
+    "stage": "speech",
+    "error": null,
+    "created_at": "2026-09-23T12:40:38.987962+00:00",
+    "updated_at": "2026-09-23T12:40:42.611341+00:00"
+  },
+  "speaker_map": [
+    {
+      "speaker_id": "SPEAKER_01",
+      "participant_id": "p1",
+      "confirmed": true
+    }
+  ],
+  "extract_status": 200,
+  "docx_bytes": 37557
+}

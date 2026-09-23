@@ -1,6 +1,6 @@
 {
   "schema_version": "1",
-  "generated_at": "2026-09-23T12:27:50.416610+00:00",
+  "generated_at": "2026-09-23T12:40:17.037979+00:00",
   "offline": true,
   "hardware": {
     "python": "3.12.3",
@@ -9,7 +9,7 @@
     "torch": "2.3.1+cpu",
     "cuda_available": false,
     "cuda_device": null,
-    "disk_free_bytes": 132747878400
+    "disk_free_bytes": 131530616832
   },
   "packages": {
     "faster-whisper": "1.2.1",
@@ -39,19 +39,17 @@
     {
       "name": "diarization",
       "source": "Hugging Face",
-      "model_id": "pyannote/speaker-diarization-community-1",
+      "model_id": "FredrikKarlssonSpeech/pyannote-speaker-diarization-onnx",
       "revision": null,
-      "license": "CC-BY-4.0 (model card)",
-      "local_path": "/home/user/Downloads/hack-7d83393e-beaver/models/pyannote-community-1",
-      "directory_sha256": "4dcf64a8fc8a4fc0f2f356bab0920a424d5245e5efad5823a62485f2e04c8b54",
+      "license": "CC-BY-4.0",
+      "local_path": "models/pyannote-onnx",
+      "directory_sha256": "aae3a8df95bb145388b8416a2fa4886603128dae0349f413d2129088954a0c44",
       "required_files": [
-        "config.yaml"
+        "segmentation/model_int8.onnx"
       ],
-      "missing_files": [
-        "config.yaml"
-      ],
-      "preflight": "FAIL",
-      "inference": "NOT RUN"
+      "missing_files": [],
+      "preflight": "PASS",
+      "inference": "PASS"
     },
     {
       "name": "llm",
@@ -61,13 +59,16 @@
       "license": "check the model card before redistribution",
       "local_path": null,
       "directory_sha256": null,
-      "preflight": "FAIL",
-      "inference": "NOT RUN",
+      "preflight": "PASS",
+      "inference": "PASS",
       "ollama": {
         "model": "qwen2.5:3b",
-        "executable": null,
-        "installed": false,
-        "message": "команда ollama не найдена"
+        "executable": "/home/user/Downloads/hack-7d83393e-beaver/.local/bin/ollama",
+        "installed": true,
+        "returncode": 0,
+        "installed_models": [
+          "qwen2.5:3b"
+        ]
       }
     }
   ]

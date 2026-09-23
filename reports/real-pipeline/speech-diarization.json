@@ -1,0 +1,82 @@
+{
+  "scope": "REAL_SPEECH_DIARIZATION",
+  "device": "cuda",
+  "asr_model": "faster-whisper-small",
+  "diarization_model": "FredrikKarlssonSpeech/pyannote-speaker-diarization-onnx",
+  "cases": [
+    {
+      "case": "ru_case",
+      "status": "PASS",
+      "utterances": [
+        {
+          "id": "u1",
+          "start_ms": 0,
+          "end_ms": 2800,
+          "speaker_id": "SPEAKER_01",
+          "text": "Панир! Отправьте от чертбук от ныксу!"
+        },
+        {
+          "id": "u2",
+          "start_ms": 2960,
+          "end_ms": 5220,
+          "speaker_id": "SPEAKER_01",
+          "text": "Пригабаю пиенести срок на панигельник!"
+        },
+        {
+          "id": "u3",
+          "start_ms": 5660,
+          "end_ms": 6760,
+          "speaker_id": "SPEAKER_01",
+          "text": "Та! Собасована!"
+        }
+      ],
+      "detected_speakers": [
+        "SPEAKER_01"
+      ],
+      "warnings": []
+    },
+    {
+      "case": "kk_case",
+      "status": "PASS",
+      "utterances": [
+        {
+          "id": "u1",
+          "start_ms": 5780,
+          "end_ms": 7180,
+          "speaker_id": "SPEAKER_01",
+          "text": "I"
+        }
+      ],
+      "detected_speakers": [
+        "SPEAKER_01"
+      ],
+      "warnings": []
+    },
+    {
+      "case": "mix_case",
+      "status": "PASS",
+      "utterances": [
+        {
+          "id": "u1",
+          "start_ms": 0,
+          "end_ms": 3040,
+          "speaker_id": "SPEAKER_01",
+          "text": "Paschauster, hat Praktik, hat Schildwuppertnitzel."
+        },
+        {
+          "id": "u2",
+          "start_ms": 3220,
+          "end_ms": 5380,
+          "speaker_id": "SPEAKER_01",
+          "text": "Bädlein, Patwir, Jön, Kistik."
+        }
+      ],
+      "detected_speakers": [
+        "SPEAKER_00",
+        "SPEAKER_01"
+      ],
+      "warnings": []
+    }
+  ],
+  "notice": "ONNX segmentation labels are slot identities; secretary confirmation remains required."
+}

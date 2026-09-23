@@ -152,9 +152,10 @@ def run_preflight(
         or os.environ.get("PYANNOTE_MODEL_PATH")
         or project_root / "models" / "pyannote-community-1"
     )
+    diarization_files = ("segmentation/model_int8.onnx",) if (diarization_model / "segmentation" / "model_int8.onnx").is_file() else ("config.yaml",)
     checks = [
         _check_path(asr_model, "asr_weights", ("config.json", "model.bin", "tokenizer.json")),
-        _check_path(diarization_model, "diarization_weights", ("config.yaml",)),
+        _check_path(diarization_model, "diarization_weights", diarization_files),
         _ollama_check(llm_model),
         _audio_check(audio),
     ]
