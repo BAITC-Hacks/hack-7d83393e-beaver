@@ -694,6 +694,7 @@ def _normalize_model_shape(raw: Mapping[str, Any], utterances: Sequence[Mapping[
             questions.append({"task_id": task["id"], "field": "deadline", "text": "К какому сроку нужно выполнить поручение?"})
     data["review_questions"] = questions
     data["presence_intervals"] = []
+    data["warnings"] = [str(item.get("message") if isinstance(item, Mapping) else item) for item in data.get("warnings", [])]
     return data
 
 

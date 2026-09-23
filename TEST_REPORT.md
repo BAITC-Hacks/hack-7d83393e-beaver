@@ -36,7 +36,7 @@
 | Реальная диаризация | PASS (ONNX) | `models/pyannote-onnx`, 3 speech-кейса; исходный gated PyTorch snapshot недоступен |
 | Локальная LLM | PASS (text extraction) | `qwen2.5:3b` через локальный Ollama 0.1.48, контрактный snapshot валиден |
 | Полный HTTP REAL путь | PASS | create → GPU ASR → ONNX diarization → speaker-map → local LLM → approve → DOCX; `reports/real-pipeline/http-real-ru.json` |
-| Русская, казахская и смешанная новая запись | NOT RUN | нет подтверждённого REAL E2E |
+| Русская, казахская и смешанная speech-запись | PASS (synthetic speech) | `reports/real-pipeline/full-ru.json`, `full-kk_case.json`, `full-mix_case.json`; natural audio не проверялось |
 | Заблокированная сеть и браузерная проверка | NOT RUN | не выполнялись в этой среде |
 | DOCX после реальной записи | NOT RUN | зависит от ASR, диаризации и LLM |
 

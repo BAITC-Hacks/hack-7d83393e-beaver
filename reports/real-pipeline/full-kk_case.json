@@ -1,0 +1,91 @@
+{
+  "status": "PASS",
+  "speech": {
+    "utterances": [
+      {
+        "id": "u1",
+        "start_ms": 0,
+        "end_ms": 2480,
+        "speaker_id": "SPEAKER_01",
+        "text": "I don't why they feel like a"
+      },
+      {
+        "id": "u2",
+        "start_ms": 3380,
+        "end_ms": 5020,
+        "speaker_id": "SPEAKER_01",
+        "text": "I don't know why they're"
+      },
+      {
+        "id": "u3",
+        "start_ms": 6220,
+        "end_ms": 6720,
+        "speaker_id": "SPEAKER_01",
+        "text": "You're right."
+      }
+    ],
+    "detected_speakers": [
+      "SPEAKER_01"
+    ],
+    "warnings": [],
+    "language": "en"
+  },
+  "protocol": {
+    "schema_version": "1.0",
+    "mode": "REAL",
+    "meeting": {
+      "id": "real-kk_case",
+      "started_at": "2026-09-23T10:00:00+06:00",
+      "timezone": "Asia/Almaty",
+      "title": "kk_case"
+    },
+    "participants": [
+      {
+        "id": "p1",
+        "name": "Участник 1"
+      }
+    ],
+    "speaker_map": [
+      {
+        "speaker_id": "SPEAKER_01",
+        "participant_id": "p1",
+        "confirmed": true
+      }
+    ],
+    "utterances": [
+      {
+        "id": "u1",
+        "start_ms": 0,
+        "end_ms": 2480,
+        "speaker_id": "SPEAKER_01",
+        "text": "I don't why they feel like a"
+      },
+      {
+        "id": "u2",
+        "start_ms": 3380,
+        "end_ms": 5020,
+        "speaker_id": "SPEAKER_01",
+        "text": "I don't know why they're"
+      },
+      {
+        "id": "u3",
+        "start_ms": 6220,
+        "end_ms": 6720,
+        "speaker_id": "SPEAKER_01",
+        "text": "You're right."
+      }
+    ],
+    "tasks": [],
+    "summary": [
+      {
+        "text": "status",
+        "evidence_ids": [
+          "u1"
+        ]
+      }
+    ],
+    "review_questions": [],
+    "warnings": [],
+    "presence_intervals": []
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "status": "PASS",
+  "speech": {
+    "utterances": [
+      {
+        "id": "u1",
+        "start_ms": 0,
+        "end_ms": 3040,
+        "speaker_id": "SPEAKER_01",
+        "text": "Paschauster, hat Praktik, hat Schildwuppertnitzel."
+      },
+      {
+        "id": "u2",
+        "start_ms": 3220,
+        "end_ms": 5380,
+        "speaker_id": "SPEAKER_01",
+        "text": "Bädlein, Patwir, Jön, Kistik."
+      }
+    ],
+    "detected_speakers": [
+      "SPEAKER_00",
+      "SPEAKER_01"
+    ],
+    "warnings": [],
+    "language": "de"
+  },
+  "protocol": {
+    "schema_version": "1.0",
+    "mode": "REAL",
+    "meeting": {
+      "id": "real-mix_case",
+      "started_at": "2026-09-23T10:00:00+06:00",
+      "timezone": "Asia/Almaty",
+      "title": "mix_case"
+    },
+    "participants": [
+      {
+        "id": "p1",
+        "name": "Участник 1"
+      }
+    ],
+    "speaker_map": [
+      {
+        "speaker_id": "SPEAKER_01",
+        "participant_id": "p1",
+        "confirmed": true
+      }
+    ],
+    "utterances": [
+      {
+        "id": "u1",
+        "start_ms": 0,
+        "end_ms": 3040,
+        "speaker_id": "SPEAKER_01",
+        "text": "Paschauster, hat Praktik, hat Schildwuppertnitzel."
+      },
+      {
+        "id": "u2",
+        "start_ms": 3220,
+        "end_ms": 5380,
+        "speaker_id": "SPEAKER_01",
+        "text": "Bädlein, Patwir, Jön, Kistik."
+      }
+    ],
+    "tasks": [],
+    "summary": [
+      {
+        "text": "review_status",
+        "evidence_ids": [
+          "u1"
+        ]
+      }
+    ],
+    "review_questions": [],
+    "warnings": [
+      "No deadlines or tasks were found in the provided utterances."
+    ],
+    "presence_intervals": []
+  }
+}
