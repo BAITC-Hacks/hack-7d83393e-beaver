@@ -8,6 +8,9 @@
 - Python 3.12.3, Linux x86_64, 16 CPU, 30 GiB RAM, 126 GiB свободного места.
 - Обнаружена NVIDIA GeForce RTX 3070 Laptop GPU (8 GiB), но установленный
   `torch 2.3.1+cpu` не видит CUDA. Тяжёлые модели проверяются в CPU-профиле.
+- Повторная проверка 23 сентября показала `nvidia-smi ERR!` и ошибку
+  CTranslate2 `CUDA failed with error no CUDA-capable device is detected`;
+  подробности сохранены в `reports/gpu/status.json`.
 - Проверенные пакеты: `faster-whisper 1.2.1`, `pyannote.audio 3.3.2`,
   `ollama 0.6.2`, `python-docx 1.2.0`.
 
