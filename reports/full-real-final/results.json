@@ -1,0 +1,53 @@
+{
+  "run_id": "full-real-final",
+  "scope": "FULL",
+  "generated_at": "2026-09-23T12:41:56.893037+00:00",
+  "duration_seconds": 1.673,
+  "checks": [
+    {
+      "requirement_id": "core",
+      "test_id": "unit_contract",
+      "status": "PASS",
+      "command": "/home/user/Downloads/hack-7d83393e-beaver/.venv/bin/python -m unittest discover -s tests -v",
+      "exit_code": 0
+    },
+    {
+      "requirement_id": "local_models",
+      "test_id": "offline_preflight",
+      "status": "PASS",
+      "command": "/home/user/Downloads/hack-7d83393e-beaver/.venv/bin/python scripts/preflight.py --json",
+      "exit_code": 0,
+      "reason": []
+    },
+    {
+      "requirement_id": "real_audio_ru",
+      "test_id": "real_ru_e2e",
+      "status": "NOT RUN",
+      "reason": "requires a new local RU recording"
+    },
+    {
+      "requirement_id": "real_audio_kk",
+      "test_id": "real_kk_e2e",
+      "status": "NOT RUN",
+      "reason": "requires a new local KK recording"
+    },
+    {
+      "requirement_id": "real_audio_mix",
+      "test_id": "real_mix_e2e",
+      "status": "NOT RUN",
+      "reason": "requires a new local mixed recording"
+    },
+    {
+      "requirement_id": "offline_browser",
+      "test_id": "offline_browser_e2e",
+      "status": "NOT RUN",
+      "reason": "not executed by this command"
+    }
+  ],
+  "artifacts": [],
+  "manifests": {
+    "models": "/home/user/Downloads/hack-7d83393e-beaver/models/manifest.json",
+    "data": "/home/user/Downloads/hack-7d83393e-beaver/reports/data-manifest.json"
+  },
+  "notice": "NOT RUN and FAIL are preserved; this report does not turn fixtures into REAL inference."
+}
