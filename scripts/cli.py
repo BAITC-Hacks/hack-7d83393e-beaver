@@ -256,7 +256,7 @@ def _verify(args: argparse.Namespace) -> int:
     )
     if core_code != 0:
         return 1
-    if args.profile == "full" and not report.get("ready"):
+    if args.profile == "full" and (not report.get("ready") or any(item.get("status") == "NOT RUN" for item in checks)):
         return 2
     return 0
 
