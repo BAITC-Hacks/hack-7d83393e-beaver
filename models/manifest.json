@@ -1,6 +1,6 @@
 {
   "schema_version": "1",
-  "generated_at": "2026-09-23T12:06:14.992192+00:00",
+  "generated_at": "2026-09-23T12:17:44.846987+00:00",
   "offline": true,
   "hardware": {
     "python": "3.12.3",
@@ -9,7 +9,7 @@
     "torch": "2.3.1+cpu",
     "cuda_available": false,
     "cuda_device": null,
-    "disk_free_bytes": 129968795648
+    "disk_free_bytes": 134077337600
   },
   "packages": {
     "faster-whisper": "1.2.1",
@@ -61,16 +61,13 @@
       "license": "check the model card before redistribution",
       "local_path": null,
       "directory_sha256": null,
-      "preflight": "PASS",
+      "preflight": "FAIL",
       "inference": "NOT RUN",
       "ollama": {
         "model": "qwen2.5:3b",
-        "executable": "/tmp/ollama-bin/bin/ollama",
-        "installed": true,
-        "returncode": 0,
-        "installed_models": [
-          "qwen2.5:3b"
-        ]
+        "executable": null,
+        "installed": false,
+        "message": "команда ollama не найдена"
       }
     }
   ]

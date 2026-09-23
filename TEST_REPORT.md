@@ -32,7 +32,7 @@
 | DOCX из протокола и казахские буквы | PASS | `tests/acceptance/test_export_docx.py` |
 | Реальный ASR inference | PASS (synthetic speech, 3/3) | `reports/real-asr/results.json`, локальный `faster-whisper-small`, CPU |
 | Реальная диаризация | FAIL | в `models/pyannote-community-1` отсутствует `config.yaml` |
-| Локальная LLM | NOT RUN | `qwen2.5:3b` скачана и доступна локально; строгий schema extraction превысил 180-секундный тайм-аут |
+| Локальная LLM | NOT RUN | веса `qwen2.5:3b` остались локально, но временный Ollama runtime недоступен после очистки `/tmp`; предыдущий запуск schema extraction превысил 180-секундный тайм-аут |
 | Русская, казахская и смешанная новая запись | NOT RUN | нет подтверждённого REAL E2E |
 | Заблокированная сеть и браузерная проверка | NOT RUN | не выполнялись в этой среде |
 | DOCX после реальной записи | NOT RUN | зависит от ASR, диаризации и LLM |
