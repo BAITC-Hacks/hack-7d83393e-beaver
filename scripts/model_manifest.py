@@ -157,7 +157,9 @@ def _asr_inference(path: Path, project_root: Path) -> str:
     try:
         from faster_whisper import WhisperModel
 
-        model = WhisperModel(str(path), device="cpu", compute_type="int8", local_files_only=True)
+        device = os.environ.get("WHISPER_DEVICE", "cpu")
+        compute_type = os.environ.get("WHISPER_COMPUTE_TYPE", "int8" if device == "cpu" else "float16")
+        model = WhisperModel(str(path), device=device, compute_type=compute_type, local_files_only=True)
         list(model.transcribe(str(audio), task="transcribe", beam_size=1, vad_filter=True)[0])
         return "PASS"
     except Exception as exc:  # pragma: no cover - native model runtime

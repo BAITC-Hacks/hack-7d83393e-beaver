@@ -97,6 +97,8 @@ def _call_speech(audio_path: str, meeting: dict[str, Any]) -> dict[str, Any]:
     return transcribe_and_diarize(audio_path, {
         "mode": meeting["mode"],
         "whisper_model_path": str(settings.whisper_model_path),
+        "device": settings.whisper_device,
+        "compute_type": settings.whisper_compute_type,
         "pyannote_model_path": str(settings.pyannote_model_path),
         "fixture_path": meeting.get("fixture_path"),
     })

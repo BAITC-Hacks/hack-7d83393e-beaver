@@ -20,6 +20,8 @@ class Settings:
     mode: str = os.getenv("APP_MODE", "REAL").upper()
     data_dir: Path = Path(os.getenv("DATA_DIR", str(ROOT / "data")))
     whisper_model_path: Path = Path(os.getenv("WHISPER_MODEL_PATH", str(ROOT / "models" / "faster-whisper-small")))
+    whisper_device: str = os.getenv("WHISPER_DEVICE", "cpu")
+    whisper_compute_type: str = os.getenv("WHISPER_COMPUTE_TYPE", "int8")
     pyannote_model_path: Path = Path(os.getenv("PYANNOTE_MODEL_PATH", str(ROOT / "models" / "pyannote-community-1")))
     ollama_host: str = os.getenv("OLLAMA_HOST", "http://127.0.0.1:11434")
     ollama_model: str = os.getenv("OLLAMA_MODEL", "qwen2.5:3b")

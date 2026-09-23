@@ -1,0 +1,63 @@
+{
+  "scope": "REAL_ASR_SYNTHETIC_SPEECH_GPU",
+  "model": "faster-whisper-small",
+  "device": "cuda",
+  "compute_type": "float16",
+  "cases": [
+    {
+      "case": "ru_case",
+      "language_detected": "ru",
+      "duration_seconds": 1.47,
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 3000,
+          "text": "Панир! Отправьте от чертбук от нитсу!"
+        },
+        {
+          "start_ms": 3000,
+          "end_ms": 5700,
+          "text": "Програбаю пирензис срок на панигельник!"
+        },
+        {
+          "start_ms": 5700,
+          "end_ms": 7200,
+          "text": "Та! Собасована!"
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "case": "kk_case",
+      "language_detected": "en",
+      "duration_seconds": 19.076,
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 6560,
+          "text": "I found the link in the description, end of chapter 3 part 2"
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "case": "mix_case",
+      "language_detected": "de",
+      "duration_seconds": 8.464,
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 3040,
+          "text": "Paschauster, hat Praktik, hat Schildwuppertnitzel."
+        },
+        {
+          "start_ms": 3040,
+          "end_ms": 5540,
+          "text": "Werde ein, pat wir jön, Christik."
+        }
+      ],
+      "status": "PASS"
+    }
+  ],
+  "notice": "espeak-generated speech; not natural-audio quality"
+}

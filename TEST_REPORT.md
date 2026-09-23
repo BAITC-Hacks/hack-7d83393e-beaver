@@ -23,6 +23,7 @@
 | `.venv/bin/python scripts/model_manifest.py` | PASS | записан `models/manifest.json`; Whisper smoke inference PASS, Ollama установлен, text extraction NOT RUN |
 | `.venv/bin/python scripts/cli.py e2e` | NOT RUN | команда ограничена fixture smoke test; REAL audio/browser E2E не выполнен |
 | локальный faster-whisper на `data/real/*_case.wav` | PASS, 3/3 | espeak-сгенерированная речь; это synthetic-speech smoke, не natural-audio оценка |
+| faster-whisper на RTX 3070 (`cuda`, `float16`) | PASS, 3/3 | `reports/real-asr/gpu-results.json`; GPU после рестарта работает |
 
 ## Требования приёмки
 
