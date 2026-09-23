@@ -1,0 +1,67 @@
+{
+  "scope": "REAL_ASR_SYNTHETIC_SPEECH",
+  "model": "faster-whisper-small",
+  "device": "cpu",
+  "cases": [
+    {
+      "case": "ru_case",
+      "language_detected": "ru",
+      "duration_seconds": 4.727,
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 3000,
+          "text": "В панир, от прафти от чертбопа от нитси."
+        },
+        {
+          "start_ms": 3000,
+          "end_ms": 5700,
+          "text": "Прегабаю пирензис срок на панигельник."
+        },
+        {
+          "start_ms": 5700,
+          "end_ms": 7000,
+          "text": "Та, сабасована."
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "case": "kk_case",
+      "language_detected": "ru",
+      "duration_seconds": 2.404,
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 6000,
+          "text": "Ай, да, ты и не геркисептичь, а лето, чьи бей, и гем, а лето, чьи бей, и гем, и гей, и гей, и гей."
+        },
+        {
+          "start_ms": 6000,
+          "end_ms": 7000,
+          "text": "Кистика."
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "case": "mix_case",
+      "language_detected": "ru",
+      "duration_seconds": 1.982,
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 3000,
+          "text": "Пашауста, отправься от чертбопятницы!"
+        },
+        {
+          "start_ms": 3000,
+          "end_ms": 6000,
+          "text": "Бедлайн патфирюн, кистик!"
+        }
+      ],
+      "status": "PASS"
+    }
+  ],
+  "notice": "espeak-generated speech; not natural-audio quality"
+}

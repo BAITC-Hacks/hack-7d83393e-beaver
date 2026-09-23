@@ -9,6 +9,15 @@
       "license": "generated locally",
       "natural_audio": false,
       "used_for": ["faster-whisper smoke inference"]
+    },
+    {
+      "path": "data/real/*_case.wav",
+      "kind": "synthetic_speech",
+      "language": "ru/kk/mix labels",
+      "source": "espeak generated locally",
+      "license": "generated locally",
+      "natural_audio": false,
+      "used_for": ["three-case faster-whisper ASR smoke"]
     }
   ],
   "notice": "Synthetic tone is not a speech-quality or natural-audio evaluation."

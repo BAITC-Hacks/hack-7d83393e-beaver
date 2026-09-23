@@ -19,6 +19,7 @@
 | `.venv/bin/python scripts/preflight.py --json` | NOT READY | ASR и Ollama готовы; pyannote неполный |
 | `.venv/bin/python scripts/model_manifest.py` | PASS | записан `models/manifest.json`; Whisper smoke inference PASS, Ollama установлен, text extraction NOT RUN |
 | `.venv/bin/python scripts/cli.py e2e` | NOT RUN | команда ограничена fixture smoke test; REAL audio/browser E2E не выполнен |
+| локальный faster-whisper на `data/real/*_case.wav` | PASS, 3/3 | espeak-сгенерированная речь; это synthetic-speech smoke, не natural-audio оценка |
 
 ## Требования приёмки
 
@@ -26,7 +27,7 @@
 |---|---|---|
 | Контрактные fixtures, evidence и null | PASS | `scripts/cli.py test` |
 | DOCX из протокола и казахские буквы | PASS | `tests/acceptance/test_export_docx.py` |
-| Реальный ASR inference | PASS (synthetic smoke) | `data/synthetic/ru_sine.wav`, локальный `faster-whisper-small`, CPU |
+| Реальный ASR inference | PASS (synthetic speech, 3/3) | `reports/real-asr/results.json`, локальный `faster-whisper-small`, CPU |
 | Реальная диаризация | FAIL | в `models/pyannote-community-1` отсутствует `config.yaml` |
 | Локальная LLM | NOT RUN | `qwen2.5:3b` скачана и доступна локально; строгий schema extraction превысил 180-секундный тайм-аут |
 | Русская, казахская и смешанная новая запись | NOT RUN | нет подтверждённого REAL E2E |
