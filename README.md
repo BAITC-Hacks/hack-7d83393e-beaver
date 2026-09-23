@@ -1,195 +1,264 @@
-# Пакет заданий для агентной сборки: «Совещание без потерянных поручений»
+# Совещание без потерянных поручений
 
-Дата подготовки: 23 сентября 2026 года.
+Локальный прототип секретаря совещаний: запись проходит через распознавание
+речи и диаризацию, затем из транскрипта формируется проверяемый протокол с
+поручениями, сроками и ссылками на реплики. Секретарь подтверждает соответствие
+голоса участнику, исправляет черновик и только после этого утверждает и
+экспортирует DOCX.
 
-**Статус: локальный прототип и проверочный контур собраны.** Есть FastAPI/SQLite,
-локальный интерфейс, контрактный протокол, fixture-путь до DOCX, manifest моделей
-и явные ошибки REAL-режима. В текущем отчёте ASR-вес найден, комплект pyannote
-неполный, а Ollama отсутствует; поэтому реальный сквозной сценарий не объявляется
-готовым. См. [`TEST_REPORT.md`](TEST_REPORT.md). Локальная `qwen2.5:3b`
-скачана и доступна Ollama; строгий text extraction отмечен в отчёте как
-`NOT RUN` после тайм-аута.
+Проект рассчитан на команды, которым нужен воспроизводимый протокол без
+отправки аудио и текста во внешнее облако. Приложение работает на одном
+локальном компьютере и обрабатывает одно совещание за раз.
 
-## Начало работы
-Передать интегратору `MASTER_PROMPT.md`, затем дать каждому исполнителю
-`AGENTS.md`, `contract.schema.json`, `API.md` и его файл из `agent_tasks/`.
-Только интегратор меняет общие контракты и зависимости. У агентов разные ветки
-или рабочие каталоги. Не требуется установка нового оркестратора ради спринта.
-Название/версия конкретной Luna не были заданы: платформа-специфические команды
-здесь намеренно не выдуманы.
+## Что реализовано
 
-## Продукт
-Обязательная основа: локальный ввод аудио, русский/казахский/смешанная речь,
-диаризация, подтверждение соответствия голосов участникам, автоматические
-поручения, саммари, редактирование секретарём и DOCX.
-Две отличительные функции: вопросы о недостающих реквизитах и история
-согласованных изменений со ссылками на речь.
-Опционально: YOLO предлагает интервал для карточки «Что обсуждали за это время».
-Никаких эмоций, рейтингов внимания, распознавания лиц или голосовой биометрии.
+- локальный веб-интерфейс на русском языке;
+- два явно различающихся режима: `REAL` (локальные модели) и `FIXTURE`
+  (детерминированный синтетический пример);
+- загрузка аудио/видео и фоновая обработка с отображением статуса job;
+- транскрибирование через локальный `faster-whisper` без перевода исходной
+  речи;
+- диаризация через открытый ONNX-экспорт сегментации, после которой секретарь
+  вручную подтверждает `speaker_id → participant_id`;
+- извлечение саммари, поручений, сроков, вопросов по отсутствующим реквизитам и
+  предупреждений через локальную модель Ollama;
+- evidence: каждая реплика, поручение и изменение связаны с существующими
+  временными интервалами транскрипта;
+- ручное исправление поручений с аудитом и типизированный ledger для событий
+  `create/propose/accept/reject/cancel` с воспроизведением по времени;
+- просмотр событий выбранного интервала («что обсуждали»);
+- явное утверждение протокола человеком и экспорт черновика или утверждённой
+  версии в DOCX;
+- JSON Schema протокола версии 1.0 и семантическая проверка ссылок, участников,
+  дат и интервалов.
+
+## Как работает решение
+
+1. Секретарь создаёт встречу, указывает дату, часовой пояс и участников.
+2. Выбирается `REAL` или `FIXTURE`, затем загружается локальная запись.
+3. В `REAL` локальные Whisper и ONNX-диаризатор создают реплики с временными
+   метками и слотами говорящих. В `FIXTURE` берётся только заранее сохранённый
+   пример; он помечается в интерфейсе как синтетический.
+4. Секретарь сопоставляет слоты говорящих с участниками и подтверждает карту.
+   Это ручное подтверждение, а не биометрическая идентификация.
+5. Локальная Ollama-модель извлекает черновик протокола. Сроки считаются от
+   даты совещания в его часовом поясе; неизвестные исполнитель и срок остаются
+   `null`.
+6. Секретарь проверяет evidence, редактирует поля при необходимости,
+   утверждает протокол и скачивает DOCX с соответствующей маркировкой.
+
+## Технологии и модели
+
+| Слой | Реализация |
+|---|---|
+| Язык и запуск | Python 3.12, FastAPI, Uvicorn |
+| Хранилище | SQLite (`storage.py`) |
+| Интерфейс | HTML, CSS и vanilla JavaScript в `static/` |
+| Распознавание | `faster-whisper` / CTranslate2, локальная модель `Systran/faster-whisper-small` |
+| Диаризация | ONNX Runtime, `soundfile`, `scipy`; локальный открытый экспорт `FredrikKarlssonSpeech/pyannote-speaker-diarization-onnx` |
+| Извлечение протокола | Ollama на loopback (`127.0.0.1:11434`), модель `qwen2.5:3b` |
+| Контракты и экспорт | `jsonschema`, `python-docx`, `contract.schema.json`, `ledger.schema.json` |
+| Проверки | стандартный `unittest`, скрипты `preflight.py`, `model_manifest.py`, `cli.py` |
+
+В рабочем режиме приложение не обращается к внешнему API. Hugging Face нужен
+только для предварительного скачивания весов в локальные каталоги; Ollama также
+запускается локально. Модели, записи и секреты не входят в Git.
+
+## Архитектура
+
+```mermaid
+graph LR
+    B[Браузер] --> A[FastAPI / app.py]
+    A --> S[SQLite / storage.py]
+    A --> SP[services/speech.py]
+    SP --> W[faster-whisper]
+    SP --> D[ONNX diarization]
+    A --> P[services/protocol.py]
+    P --> O[Ollama qwen2.5:3b]
+    P --> C[contracts.py + JSON Schema]
+    L[services/ledger.py] --> C
+    C --> X[services/export_docx.py]
+    X --> DOCX[DOCX]
+```
+
+Основные точки HTTP-контракта: `POST /api/meetings`, `POST
+/api/meetings/{id}/audio`, `GET /api/jobs/{id}`, `GET
+/api/meetings/{id}/protocol`, `PUT /api/meetings/{id}/speaker-map`, `POST
+/api/meetings/{id}/extract`, `PATCH /api/meetings/{id}/tasks/{task_id}`, `POST
+/api/meetings/{id}/approve`, `GET /api/meetings/{id}/export.docx` и `POST
+/api/meetings/{id}/catch-up`. Полный список и форматы находятся в [API.md](API.md).
 
 ## Интерфейс
 
-Главный экран объединяет создание совещания, загрузку записи, транскрипт,
-подтверждение говорящих, поручения, вопросы секретарю и экспорт DOCX.
+Главный экран объединяет создание встречи, загрузку записи, транскрипт,
+подтверждение говорящих, поручения, вопросы секретарю и экспорт.
 
 ![Главный экран локального протокола](reports/ui/interface.png)
 
-Заполненный экран показывает транскрипт с временными метками, подтверждение
-speaker map, поручение со статусом `approved`, ссылки на evidence и скачивание
-DOCX:
+Заполненный экран показывает транскрипт с временными метками, speaker map,
+evidence и действие скачивания DOCX.
 
-![Проверка REAL-протокола](reports/ui/protocol-preview.png)
+![Предпросмотр протокола](reports/ui/protocol-preview.png)
 
-## Условия спринта
-120 минут — бюджет команды, не обещание завершения. Веса и рабочее окружение
-нужно проверить в начале. Не заменять сломавшуюся модель облачным API.
-Если локальный ASR/диаризация не заработали, явно указать невыполненный пункт.
-Воспроизведение эталонного JSON — отдельный режим FIXTURE, а не работающий ИИ.
+## Установка и запуск
 
-## Файлы
-- `MASTER_PROMPT.md`: общее задание интегратору.
-- `AGENTS.md`: общие правила и границы ответственности.
-- `SPRINT.md`: бюджет этапов и правила сокращения объёма.
-- `API.md`: минимальный интерфейс модулей и HTTP.
-- `agent_tasks/`: четыре основных задания и один опциональный видеомодуль.
-- `contract.schema.json`: JSON Schema протокола версии 1.0.
-- `examples/`: три полностью вымышленных эталона, НЕ результаты распознавания.
-- `ACCEPTANCE.md`: проверки реального приложения.
-- `DEMO.md`: сценарий защиты и реплики для самостоятельной записи.
-- `SOURCES.md`: первичная документация компонентов.
-- `check_examples.py`: проверка схемы и ссылочной целостности эталонов.
-- `scripts/cli.py`: команды `bootstrap`, `doctor`, `run`, `test`, `e2e`, `stop`.
-- `scripts/model_manifest.py`: офлайн-инвентаризация моделей и digest каталога.
-- `models/manifest.json`: фактическое состояние весов в текущей среде.
-- `TEST_REPORT.md`, `reports/test-results.json`: фактические результаты проверок.
-- `requirements-traceability.json`: матрица требований, команд и фактических статусов.
-
-Для проверки эталонов нужен Python с пакетом `jsonschema`.
-
-## Локальная проверка и экспорт
-
-Создание окружения и установка Python-зависимостей выполняются в режиме
-`BOOTSTRAP_ONLINE`:
+### 1. Python-окружение
 
 ```bash
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
-.venv/bin/python scripts/cli.py bootstrap
-```
-
-`bootstrap` устанавливает только Python-пакеты. Он не скачивает модели.
-Запуск приложения выполняется отдельно в режиме `RUN_OFFLINE`:
-
-```bash
-.venv/bin/python scripts/cli.py doctor
-.venv/bin/python scripts/cli.py run --host 127.0.0.1 --port 8000
-# в другом терминале
-.venv/bin/python scripts/cli.py stop
-```
-
-Откройте `http://127.0.0.1:8000`. Для проверки UI без моделей выберите режим
-`FIXTURE`; постоянный баннер помечает синтетический результат.
-
-Единая CLI-точка для повторяемых проверок:
-
-```bash
-.venv/bin/python scripts/cli.py doctor
 .venv/bin/python scripts/cli.py test
-.venv/bin/python scripts/cli.py e2e
-.venv/bin/python scripts/cli.py verify --profile core --offline --out reports/core
-.venv/bin/python scripts/cli.py verify --profile full --offline --out reports/full
-.venv/bin/python scripts/cli.py stop
 ```
 
-`verify --profile full` возвращает код 2, пока обязательные REAL-модули не
-проверены. `evaluate --input <dir> --out <dir>` создаёт отчёт с `NOT RUN`, если
-новый набор реальных данных не передан. Модельный manifest находится в
-`models/manifest.json`, а отчёт запуска — в `reports/`.
+`requirements.txt` устанавливает только Python-зависимости. Веса моделей не
+скачиваются автоматически.
 
-Команды проверки не отправляют аудио или протоколы наружу. В текущей среде:
-Python `3.12.3`, Linux x86_64, 16 CPU, 30 GiB RAM, 126 GiB свободного места;
-обнаружена NVIDIA GeForce RTX 3070 Laptop GPU (8 GiB), но установленный
-`torch 2.3.1+cpu` не использует CUDA; Ollama работает в CPU-профиле. Точный список пакетов и digest записаны в
-`models/manifest.json`. Экспорт требует `python-docx` (MIT), проверка схемы —
-`jsonschema` (MIT). Лицензии локальных моделей указаны в manifest и требуют
-отдельной проверки перед распространением.
+### 2. Подготовка локальных моделей (один раз при доступной сети)
 
-Подготовка весов выполняется заранее, пока сеть разрешена, с явным указанием
-локальных каталогов. Например, для faster-whisper:
+ASR-модель должна находиться в `models/faster-whisper-small`:
 
 ```bash
 .venv/bin/pip install huggingface_hub
 .venv/bin/python - <<'PY'
 from huggingface_hub import snapshot_download
 snapshot_download("Systran/faster-whisper-small", local_dir="models/faster-whisper-small")
+snapshot_download(
+    "FredrikKarlssonSpeech/pyannote-speaker-diarization-onnx",
+    local_dir="models/pyannote-onnx",
+)
 PY
-ollama pull qwen2.5:3b
 ```
 
-Для pyannote `community-1` требуется вручную принять условия модели и получить
-разрешённый локальный snapshot; токены не записываются в репозиторий. Пример
-подготовки выполняется только в online shell. После подготовки запуск не
-скачивает модели: задайте `ASR_MODEL_PATH`/`WHISPER_MODEL_PATH`,
-`DIARIZATION_MODEL_PATH`/`PYANNOTE_MODEL_PATH`, `OLLAMA_BIN` и `OLLAMA_MODEL`, затем проверьте
-окружение офлайн:
-
-В проверенном локальном профиле использован открытый ONNX-экспорт сегментации
-`FredrikKarlssonSpeech/pyannote-speaker-diarization-onnx` (CC-BY-4.0):
-`DIARIZATION_MODEL_PATH=./models/pyannote-onnx`. Метки слотов говорящих всё
-равно требуют подтверждения секретаря.
+Локальный runtime Ollama должен содержать `qwen2.5:3b`. В текущем окружении
+используется бинарник `.local/bin/ollama` и каталог `models/ollama` (оба
+игнорируются Git):
 
 ```bash
-.venv/bin/python scripts/model_manifest.py
-.venv/bin/python scripts/preflight.py --json --strict
-.venv/bin/python scripts/cli.py test
+mkdir -p models/ollama
+OLLAMA_HOST=127.0.0.1:11434 \
+OLLAMA_MODELS="$PWD/models/ollama" \
+OLLAMA_NO_CLOUD=1 \
+.local/bin/ollama serve
 ```
 
-Для GPU-профиля faster-whisper нужны CUDA-библиотеки CTranslate2 и явные
-параметры запуска:
+В другом терминале при необходимости выполните `.local/bin/ollama pull
+qwen2.5:3b`. Если бинарник Ollama ещё не подготовлен в окружении, его нужно
+установить отдельно до запуска этого шага.
+
+### 3. Переменные окружения
+
+Для CPU достаточно значений по умолчанию. Для проверенного GPU-профиля RTX
+3070 использовались:
 
 ```bash
-.venv/bin/pip install nvidia-cublas-cu12 nvidia-cuda-nvrtc-cu12
+export WHISPER_MODEL_PATH="$PWD/models/faster-whisper-small"
+export PYANNOTE_MODEL_PATH="$PWD/models/pyannote-onnx"
+export WHISPER_DEVICE=cuda
+export WHISPER_COMPUTE_TYPE=float16
+export OLLAMA_HOST=http://127.0.0.1:11434
+export OLLAMA_MODEL=qwen2.5:3b
+export OLLAMA_NO_CLOUD=1
+export OLLAMA_BIN="$PWD/.local/bin/ollama"
 export LD_LIBRARY_PATH="$PWD/.venv/lib/python3.12/site-packages/nvidia/cublas/lib:$PWD/.venv/lib/python3.12/site-packages/nvidia/cuda_nvrtc/lib:$LD_LIBRARY_PATH"
-export WHISPER_DEVICE=cuda WHISPER_COMPUTE_TYPE=float16
 ```
 
-`preflight.py` проверяет обязательные файлы весов, локальный `ollama list`,
-чтение WAV или локального файла через `ffprobe`, а также импорты FastAPI, ASR,
-диаризации, экспорта и служебных пакетов. Он не скачивает зависимости или
-модели и не принимает URL. Наличие обязательных файлов ещё не является
-доказательством inference: это отдельно фиксируется в manifest и отчёте.
-Сквозной fixture-путь сервера проверяется `tests/test_app.py`; он не заменяет
-обязательную проверку новой реальной записи.
+На CPU задайте `WHISPER_DEVICE=cpu` и `WHISPER_COMPUTE_TYPE=int8`.
 
-Для типизированной истории есть sidecar [`ledger.schema.json`](ledger.schema.json)
-и `services/ledger.py`. Endpoint `POST /api/meetings/{id}/ledger/replay`
-воспроизводит create/propose/accept/reject/cancel по префиксу времени и явно
-адаптирует результат обратно к snapshot-контракту 1.0.
+### 4. Запуск приложения
 
-`scripts/cli.py e2e` запускает только локальный fixture smoke test и явно печатает
-`REAL audio/browser E2E = NOT RUN`. Браузерная проверка, три новые записи и
-offline acceptance требуют отдельного запуска и не получают PASS автоматически.
+```bash
+.venv/bin/python scripts/preflight.py --json --strict
+.venv/bin/python scripts/cli.py run --host 127.0.0.1 --port 8000
+```
 
-Три обязательных сценария для ручного отчёта:
+Откройте <http://127.0.0.1:8000>. Остановить сервер можно командой:
 
-| Сценарий | Вход | Что сохранить | Статус в этом пакете |
-|---|---|---|---|
-| RU | новая русская запись | транскрипт, говорящие, DOCX и сравнение с ручным эталоном | NOT RUN |
-| KK | новая казахская запись | те же артефакты и буквы Ә Ғ Қ Ң Ө Ұ Ү Һ І | NOT RUN |
-| MIX | новая смешанная запись | те же артефакты, перенос срока и вопросы по null | NOT RUN |
+```bash
+.venv/bin/python scripts/cli.py stop
+```
 
-| Требование | Реализовано | Чем проверено |
+## Как проверить решение
+
+Быстрый сценарий для жюри не требует моделей и показывает весь интерфейс:
+
+```bash
+.venv/bin/python scripts/cli.py test
+.venv/bin/python check_examples.py
+.venv/bin/python scripts/cli.py run --host 127.0.0.1 --port 8000
+```
+
+В браузере:
+
+1. выберите `FIXTURE — синтетический пример`;
+2. создайте встречу с участниками `p1:Данияр, p2:Айдана`;
+3. выберите небольшой локальный аудиофайл и нажмите «Загрузить и обработать»;
+4. подтвердите speaker map, нажмите «Извлечь поручения»;
+5. проверьте evidence и статус черновика, затем утвердите и скачайте DOCX.
+
+Для проверки окружения с локальными моделями:
+
+```bash
+DIARIZATION_MODEL_PATH="$PWD/models/pyannote-onnx" \
+OLLAMA_BIN="$PWD/.local/bin/ollama" \
+.venv/bin/python scripts/preflight.py --json --strict
+.venv/bin/python -m unittest discover -s tests -v
+```
+
+Фактические артефакты текущей проверки:
+
+| Проверка | Результат | Артефакт |
 |---|---|---|
-| DOCX из протокола без LLM | Да, `services/export_docx.py` | `tests/acceptance/test_export_docx.py` |
-| Дата, участники, саммари и поручения | Да | data-level DOCX-тест |
-| Evidence с временными метками и история | Да | data-level DOCX-тест |
-| Черновик/утверждение | Да, по явному маркеру протокола | data-level DOCX-тест |
-| Казахские буквы | Да, Unicode и шрифт документа | data-level DOCX-тест |
-| Реальный ASR, диаризация, LLM | Интерфейсы и явные ошибки есть | обязательный REAL-тест, NOT RUN |
-| Работа при заблокированной сети | Дизайн preflight/export локальный | ручной offline-тест, NOT RUN |
+| Unit, контрактные, protocol, ledger и DOCX-тесты | 18 тестов, `PASS` | `reports/test-results.json` |
+| ASR на трёх WAV, сгенерированных `espeak` | `PASS`, GPU-профиль | [`reports/real-asr/gpu-results.json`](reports/real-asr/gpu-results.json) |
+| ASR + ONNX-диаризация на RU/KK/MIX файлах | технический путь `PASS` | [`reports/real-pipeline/speech-diarization.json`](reports/real-pipeline/speech-diarization.json) |
+| Полный локальный HTTP-путь для RU | job `done`, extraction HTTP 200, DOCX создан | [`reports/real-pipeline/http-real-ru.json`](reports/real-pipeline/http-real-ru.json) |
+| Полный прямой путь KK и MIX | контрактный результат `PASS` | [`full-kk_case.json`](reports/real-pipeline/full-kk_case.json), [`full-mix_case.json`](reports/real-pipeline/full-mix_case.json) |
 
-Известные ограничения: экспорт не проверяет смысловую правильность evidence и
-не заменяет утверждение секретаря; отсутствующий ID evidence намеренно помечается
-в документе как ошибка; `python-docx`, локальные модели и Ollama должны быть
-установлены отдельно. Синтетические JSON в `examples/` не считаются результатом
-ASR и не заменяют три записи из таблицы.
+## Данные и интеграции
+
+- `examples/` содержит три вымышленных JSON-эталона для `FIXTURE`; это не
+  результаты распознавания.
+- Загруженные записи и SQLite-файл хранятся локально в `data/` и не отслеживаются
+  Git.
+- Контракт протокола описан в [`contract.schema.json`](contract.schema.json),
+  история изменений — в [`ledger.schema.json`](ledger.schema.json).
+- Входной текст транскрипта передаётся модели как данные в разделённом блоке;
+  он не является инструкцией и не получает права выполнять команды.
+- Сетевые адреса моделей и Ollama ограничены локальными путями и loopback;
+  произвольные URL для скачивания моделей запрещены.
+
+## Ограничения текущей версии
+
+- Реальные прогонки выполнены на синтетической речи, созданной `espeak`.
+  Это подтверждает технический pipeline, но не качество распознавания живой
+  записи: в KK/MIX отчётах текст и определённый язык могут быть ошибочными.
+- ONNX-адаптер выдаёт слоты активности говорящих. Связь слота с человеком
+  подтверждает секретарь; голосовая биометрическая идентификация не выполняется.
+- Гейтированный оригинальный snapshot `pyannote/speaker-diarization-community-1`
+  в текущем окружении недоступен, поэтому используется открытый ONNX-экспорт.
+- `scripts/cli.py verify --profile full --offline` оставляет проверки новой
+  естественной RU/KK/MIX записи и браузерного offline E2E как `NOT RUN` и
+  возвращает код 2, пока эти проверки не выполнены отдельно.
+- Поддерживается одно совещание за раз. Нет интеграций Teams/Zoom/Meet,
+  удалённой очереди, промышленной аутентификации или распознавания лиц.
+- Скорость и качество извлечения зависят от локального Ollama и выбранной
+  модели; при отсутствии модели `REAL` завершается явной ошибкой и не заменяется
+  fixture-путём.
+
+## Deployed-версия
+
+Публичной или удалённой deployed-версии нет. Запуск предусмотрен локально по
+адресу <http://127.0.0.1:8000>.
+
+## Структура репозитория
+
+- [`app.py`](app.py), [`storage.py`](storage.py) — HTTP-приложение и SQLite;
+- [`services/speech.py`](services/speech.py) — ASR и диаризация;
+- [`services/protocol.py`](services/protocol.py) — извлечение протокола;
+- [`services/ledger.py`](services/ledger.py) — история событий;
+- [`services/export_docx.py`](services/export_docx.py) — экспорт;
+- [`static/`](static/) — интерфейс;
+- [`scripts/cli.py`](scripts/cli.py), [`scripts/preflight.py`](scripts/preflight.py)
+  — запуск и проверки;
+- [`AGENTS.md`](AGENTS.md), [`API.md`](API.md), [`DEMO.md`](DEMO.md) — правила,
+  API и сценарий демонстрации.
