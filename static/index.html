@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Совещание без потерянных поручений</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <p class="eyebrow">ЛОКАЛЬНЫЙ ПРОТОКОЛ</p>
+      <h1>Совещание без потерянных поручений</h1>
+      <p class="muted">Пакетная обработка после записи. Черновик утверждает секретарь.</p>
+      <div id="banner" class="banner hidden" role="status" aria-live="polite"></div>
+      <div id="fixture-banner" class="banner fixture-banner hidden" role="note">FIXTURE: синтетический пример, не результат распознавания.</div>
+    </header>
+
+    <section class="card" id="create-card">
+      <h2>1. Создать совещание</h2>
+      <form id="meeting-form">
+        <label>Название<input name="title" value="Рабочее совещание" required></label>
+        <label>Дата и время<input name="started_at" type="datetime-local" required></label>
+        <label>Часовой пояс<input name="timezone" value="Asia/Almaty" required></label>
+        <label>Режим<select name="mode"><option value="REAL">REAL — локальные модели</option><option value="FIXTURE">FIXTURE — синтетический пример</option></select></label>
+        <label>Участники<input name="participants" value="p1:Данияр, p2:Айдана" placeholder="id:Имя, id:Имя"></label>
+        <button>Создать</button>
+      </form>
+    </section>
+
+    <section class="card hidden" id="audio-card">
+      <h2>2. Запись</h2>
+      <form id="audio-form"><label>Файл записи<input id="audio-file" type="file" accept="audio/*,video/*" required></label><button id="upload-button">Загрузить и обработать</button></form>
+      <p id="job-status" class="muted" role="status" aria-live="polite">Ожидается файл записи.</p>
+    </section>
+
+    <section class="card hidden" id="review-card">
+      <h2>3. Проверка протокола</h2>
+      <p id="protocol-state" class="state draft">Состояние: черновик</p>
+      <section id="participants-section" aria-labelledby="participants-heading">
+        <h3 id="participants-heading">Участники</h3>
+        <div id="participants" class="empty-state">Участники не указаны.</div>
+      </section>
+      <div id="speaker-map"></div>
+      <button id="extract">Извлечь поручения</button>
+      <div id="protocol"></div>
+      <button id="approve" class="hidden">Утвердить протокол</button>
+      <a id="export" class="button hidden" download="meeting-protocol.docx">Скачать DOCX (черновик)</a>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>

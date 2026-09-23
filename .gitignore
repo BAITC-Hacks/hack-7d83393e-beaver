@@ -1,0 +1,14 @@
+__pycache__/
+.venv/
+data/
+.pytest_cache/
+.env
+.env.*
+!.env.example
+weights/
+models/
+recordings/
+real_data/
+*.wav
+*.mp3
+*.mp4
